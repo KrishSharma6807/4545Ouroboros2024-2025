@@ -60,16 +60,16 @@ public abstract class TeleLib extends OpMode {
 
     public void ArcadeDrive() {
 
-        if (gamepad1.left_stick_y > 0.1 || gamepad1.left_stick_x > 0.1) {
+        if (gamepad1.left_stick_y > 0.1 && gamepad1.left_stick_x > 0.1) {
             fl.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
             br.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
-        } else if (gamepad1.left_stick_y < 0.1 || gamepad1.left_stick_x > 0.1) {
+        } else if (gamepad1.left_stick_y < 0.1 && gamepad1.left_stick_x > 0.1) {
             fl.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
             br.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
-        } else if (gamepad1.left_stick_y > 0.1 || gamepad1.left_stick_x < 0.1) {
+        } else if (gamepad1.left_stick_y > 0.1 && gamepad1.left_stick_x < 0.1) {
             fr.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
             bl.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
-        } else if (gamepad1.left_stick_y < 0.1 || gamepad1.left_stick_x < 0.1) {
+        } else if (gamepad1.left_stick_y < 0.1 && gamepad1.left_stick_x < 0.1) {
             fl.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
             br.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
         }
