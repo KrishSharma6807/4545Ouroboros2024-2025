@@ -48,6 +48,8 @@ public abstract class TeleLib extends OpMode {
             fl.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
             br.setPower(gamepad1.left_stick_y - gamepad1.left_stick_x);
         }
+        if (gamepad1.right_trigger > 0.1 ) {
+            fl.setPower(gamepad1.left_stick_y + gamepad1.left_stick_x);
     }
      public void kill() {
          bl.setPower(0);
