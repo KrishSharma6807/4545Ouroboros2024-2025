@@ -14,7 +14,7 @@ public abstract class TeleLib extends OpMode {
     public DcMotor fl;
     public CRServo horizSlideLeft;
     public CRServo horizSlideRight;
-    public CRServo intakeTilt;
+    public Servo intakeTilt;
     public DcMotor intake;
 
     public Servo wrist;
@@ -30,7 +30,7 @@ public abstract class TeleLib extends OpMode {
         claw = hardwareMap.get(Servo.class, "claw");
         horizSlideLeft = hardwareMap.get(CRServo.class, "leftSlide");
         horizSlideRight = hardwareMap.get(CRServo.class, "rightSlide");
-        intakeTilt = hardwareMap.get(CRServo.class, "intakeTilt");
+        intakeTilt = hardwareMap.get(Servo.class, "intakeTilt");
         intake = hardwareMap.get(DcMotor.class, "intake");
 
         br.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -39,7 +39,7 @@ public abstract class TeleLib extends OpMode {
         fl.setDirection(DcMotorSimple.Direction.FORWARD);
         horizSlideLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         horizSlideRight.setDirection(DcMotorSimple.Direction.FORWARD);
-        intakeTilt.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeTilt.setDirection(Servo.Direction.REVERSE);
         intake.setDirection(DcMotorSimple.Direction.FORWARD);
 
 
@@ -79,11 +79,9 @@ public abstract class TeleLib extends OpMode {
 
     public void intake(){
         if (gamepad2.right_trigger > 0.1){
-            intakeTilt.setPower(gamepad2.right_trigger);
+            intakeTilt.setPosition(gamepad2.right_trigger);
         } else if (gamepad2.left_trigger > 0.1){
-            intakeTilt.setPower(-gamepad2.right_trigger);
-        } else {
-            intakeTilt.setPower(0);
+            intakeTilt.setPosition(-gamepad2.right_trigger);
         }
 
         if (gamepad2.right_bumper){
