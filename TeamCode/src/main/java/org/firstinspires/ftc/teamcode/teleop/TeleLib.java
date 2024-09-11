@@ -100,10 +100,9 @@ public abstract class TeleLib extends OpMode {
             wrist.setPosition(1);
         }
 
-        if (gamepad2.a) {
+        if (gamepad2.a && claw.getPosition() == 1) {
             claw.setPosition(-1);
-        }
-        if (gamepad2.b) {
+        }else if (gamepad2.a && claw.getPosition() == -1 || claw.getPosition() != -1 || claw.getPosition() != 1) {
             claw.setPosition(1);
         }
     }
