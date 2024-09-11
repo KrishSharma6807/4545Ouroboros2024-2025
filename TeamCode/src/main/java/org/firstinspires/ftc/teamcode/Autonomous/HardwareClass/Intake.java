@@ -18,19 +18,6 @@ public class Intake {
         colorSensor = opMode.hardwareMap.get(ColorRangeSensor.class, "colorSensor");
         intake = opMode.hardwareMap.get(DcMotor.class, "intake");
     }
-    public void checkColor(double sec){
-        ElapsedTime time = new ElapsedTime();
-        time.reset();
-        while (colorSensor.getDistance(DistanceUnit.CM) > 4 && time.seconds() < sec){
-            intake.setPower(1);
-            if (colorSensor.blue() > 150 && colorSensor.red() < 150 && colorSensor.getDistance(DistanceUnit.CM) < 4){
-                intake.setPower(0);
-                break;
-            } else if (colorSensor.getDistance(DistanceUnit.CM) < 4){
-                intake.setPower(-1);
-            }
-        }
-    }
 
     public void backIntake(double sec){
         ElapsedTime time = new ElapsedTime();
