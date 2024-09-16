@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode.auto
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -35,17 +35,6 @@ public abstract class practiceAuto extends LinearOpMode {
         waitForStart();
         resetRuntime();
 
-        while (opModeIsActive()) {
-
-            fl.setPower(1);
-            br.setPower(1);
-            bl.setPower(1);
-            fr.setPower(1);
-
-            telemetry.addData("Power", fl.getPower());
-            telemetry.addData("Power", fr.getPower());
-            telemetry.addData("Power", br.getPower());
-            telemetry.addData("Power", bl.getPower());
         }
     }
 }
