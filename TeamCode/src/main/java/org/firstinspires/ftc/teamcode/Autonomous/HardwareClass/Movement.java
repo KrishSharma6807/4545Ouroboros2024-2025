@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Autonomous.HardwareClass;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -13,6 +11,7 @@ public class Movement {
     public DcMotor bl;
     public DcMotor fr;
     public DcMotor fl;
+
     public Movement(HardwareMap hardwareMap){
 
         this.robot = hardwareMap;
@@ -34,11 +33,12 @@ public class Movement {
 
     }
 
+    public void motorPower() {
 
+        double fl;
+        double bl;
+        double br;
+        double fr;
 
-
-
-
-
-
+    }
 }
