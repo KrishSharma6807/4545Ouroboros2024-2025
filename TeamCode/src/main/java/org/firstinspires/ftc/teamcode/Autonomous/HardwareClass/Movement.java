@@ -20,6 +20,7 @@ public class Movement {
         fl = hardwareMap.get(DcMotor.class, "fl");
         fr = hardwareMap.get(DcMotor.class,"fr");
 
+        this.robot =
     }
 
 }
