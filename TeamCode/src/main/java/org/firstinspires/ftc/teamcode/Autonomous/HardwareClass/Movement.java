@@ -33,12 +33,20 @@ public class Movement {
 
     }
 
-    public void motorPower() {
+    public void motorPower(double p1, double p2, double p3, double p4) {
 
-        double fl;
-        double bl;
-        double br;
-        double fr;
+        fl.setPower(p1);
+        bl.setPower(p2);
+        br.setPower(p3);
+        fr.setPower(p4);
+
+    }
+    public void kill() {
+
+        fr.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
+        fl.setPower(0);
 
     }
 }
