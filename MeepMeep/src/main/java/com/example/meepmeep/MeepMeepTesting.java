@@ -18,8 +18,8 @@ public class MeepMeepTesting {
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 0, 0))
                 .lineToX(50)
                 .turn(Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(0, -24), Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(-50, 0), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(0, -24, Math.toRadians(90)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-50, 0, Math.toRadians(-90)),Math.toRadians(180))
                 .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
