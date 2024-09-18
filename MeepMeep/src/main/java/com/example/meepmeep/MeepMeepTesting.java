@@ -20,9 +20,13 @@ public class MeepMeepTesting {
                 .turn(Math.toRadians(90))
                 .lineToY(-50)
                 .splineToLinearHeading(new Pose2d(0, -50, Math.toRadians(90)),Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(50, -50),(Math.toRadians(180)))
-                //.splineTo(50)
+                .splineTo(new Vector2d(50, -50), Math.toRadians(0))
                 .build());
+                // line
+                       // line
+                            //    .splineToConstantHeading(new Vector2d(50, -50),(Math.toRadians(180)))
+
+
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
                 .setDarkMode(true)
