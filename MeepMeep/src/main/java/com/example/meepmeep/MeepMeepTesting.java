@@ -16,13 +16,9 @@ public class MeepMeepTesting {
 
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 0, 0))
                 .lineToX(30)
-                .turn(Math.toRadians(90)  )
-                .lineToY(30)
-                .turn(Math.toRadians(90))
-                .lineToX(0)
-                .turn(Math.toRadians(90))
-                .lineToY(0)
-                .turn(Math.toRadians(90))
+                .turn(Math.toRadians(180))
+                .lineToX()
+                .lineToX(-30)
                 .build());
 
         meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
