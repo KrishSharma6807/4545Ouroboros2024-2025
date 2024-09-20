@@ -6,6 +6,7 @@ import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
 import com.noahbres.meepmeep.roadrunner.entity.RoadRunnerBotEntity;
 
+
 public class MeepMeepTesting {
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(800);
@@ -15,20 +16,21 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 15)
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(0, 0, 0))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-60, 0, 0))
                 .lineToX(-50)
                 .turn(Math.toRadians(90))
                 .lineToY(-50)
-                .splineToLinearHeading(new Pose2d(0, -50, Math.toRadians(90)),Math.toRadians(180))
-                .splineTo(new Vector2d(50, -50), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(0, -65, Math.toRadians(180)),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(50, -50), Math.toRadians(0))
+               // .lineToYConstantHeading(new Vector2d(50, 50), Math.toRadians(0)) #unkown error
+                .splineToConstantHeading(new Vector2d(0, 50), Math.toRadians(0))
+                //.splineToSplineHeading(new Pose2d(-50,50, Math.toRadians(0)))   #unkown error
                 .build());
-                // line
-                       // line
-                            //    .splineToConstantHeading(new Vector2d(50, -50),(Math.toRadians(180)))
 
 
 
-        meepMeep.setBackground(MeepMeep.Background.FIELD_POWERPLAY_OFFICIAL)
+
+        meepMeep.setBackground(MeepMeep.Background.FIELD_INTO_THE_DEEP_OFFICIAL)
                 .setDarkMode(true)
                 .setBackgroundAlpha(0.95f)
                 .addEntity(myBot)
