@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.auto;
+package org.firstinspires.ftc.teamcode.auto
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -8,11 +8,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.Movement;
-
 
 public abstract class practiceAuto extends LinearOpMode {
-public Movement movement;
+
     public DcMotor br;
 
     public DcMotor bl;
@@ -24,7 +22,6 @@ public Movement movement;
     @Override
     public void runOpMode() throws InterruptedException {
 
-        movement = new Movement(hardwareMap);
         br = hardwareMap.get(DcMotor.class, "br");
         fr = hardwareMap.get(DcMotor.class, "fr");
         fl = hardwareMap.get(DcMotor.class, "fl");
@@ -37,9 +34,6 @@ public Movement movement;
 
         waitForStart();
         resetRuntime();
-
-        while (opModeIsActive()){
-            movement.motorPower(1,1,1,1);
 
         }
     }

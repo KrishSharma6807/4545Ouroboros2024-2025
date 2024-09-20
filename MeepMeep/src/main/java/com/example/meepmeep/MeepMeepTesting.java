@@ -1,5 +1,6 @@
 package com.example.meepmeep;
 
+import com.acmerobotics.roadrunner.AngularVelConstraint;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.noahbres.meepmeep.MeepMeep;
@@ -20,14 +21,12 @@ public class MeepMeepTesting {
                 .lineToX(-50)
                 .turn(Math.toRadians(90))
                 .lineToY(-50)
-                .splineToLinearHeading(new Pose2d(0, -65, Math.toRadians(180)),Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(50, -50), Math.toRadians(0))
-               // .lineToYConstantHeading(new Vector2d(50, 50), Math.toRadians(0)) #unkown error
+                .splineToLinearHeading(new Pose2d(0, -35, Math.toRadians(180)),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(50, 100), Math.toRadians(0))
+                //.lineToYConstantHeading(50, 90), Math.toRadians(0))
                 .splineToConstantHeading(new Vector2d(0, 50), Math.toRadians(0))
-                //.splineToSplineHeading(new Pose2d(-50,50, Math.toRadians(0)))   #unkown error
+                //.splineToSplineHeading(new Pose2d(-50,50, Math.toRadians(0)))
                 .build());
-        //siggggg
-////giujgoiviuh
 
 
 
