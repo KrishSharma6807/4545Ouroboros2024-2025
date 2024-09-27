@@ -13,12 +13,11 @@ import org.firstinspires.ftc.teamcode.ThreadHandler;
 
 import java.util.HashMap;
 
-public abstract class TeleLib extends OpMode {
+public abstract class ThreadTeleLib extends OpMode {
     public DcMotor br;
     public DcMotor bl;
     public DcMotor fr;
     public DcMotor fl;
-    public ThreadHandler th_intake;
     /*public CRServo horizSlideLeft;
     public CRServo horizSlideRight;
     public Servo intakeTilt;
@@ -55,19 +54,6 @@ public abstract class TeleLib extends OpMode {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
     }
+    // add threads here
 }
-
-Thread something = new Thread(new Runnable()
-{
-    @Override
-    public void run() {
-        ElapsedTime time = new ElapsedTime();
-        time.reset();
-        while (time.milliseconds() < 150){
-
-        }
-
-    }
-})
