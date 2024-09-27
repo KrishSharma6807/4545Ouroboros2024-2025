@@ -1,17 +1,24 @@
-package org.firstinspires.ftc.teamcode.teleop;
+package org.firstinspires.ftc.teamcode.Teleop;
 
+import static android.os.SystemClock.sleep;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.ThreadHandler;
+
+import java.util.HashMap;
 
 public abstract class TeleLib extends OpMode {
     public DcMotor br;
     public DcMotor bl;
     public DcMotor fr;
     public DcMotor fl;
+    public ThreadHandler th_intake;
     /*public CRServo horizSlideLeft;
     public CRServo horizSlideRight;
     public Servo intakeTilt;
@@ -48,4 +55,19 @@ public abstract class TeleLib extends OpMode {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 //        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
     }
+}
+
+Thread something = new Thread(new Runnable()
+{
+    @Override
+    public void run() {
+        ElapsedTime time = new ElapsedTime();
+        time.reset();
+        while (time.milliseconds() < 150){
+
+        }
+
+    }
+})
