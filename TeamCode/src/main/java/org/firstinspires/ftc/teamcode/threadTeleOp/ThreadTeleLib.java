@@ -3,25 +3,25 @@ package org.firstinspires.ftc.teamcode.Teleop;
 import static android.os.SystemClock.sleep;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.teamcode.ThreadHandler;
-
-import java.util.HashMap;
 
 public abstract class ThreadTeleLib extends OpMode {
     public DcMotor br;
     public DcMotor bl;
     public DcMotor fr;
     public DcMotor fl;
+    public DcMotor intake;
+    public DcMotor intakeTilt;
+    public ThreadHandler th_intake;
+    public ThreadHandler th_intakeTilt;
     /*public CRServo horizSlideLeft;
     public CRServo horizSlideRight;
     public Servo intakeTilt;
     public DcMotor intake;
+
 
     public Servo wrist;
     public Servo claw;*/
@@ -32,6 +32,11 @@ public abstract class ThreadTeleLib extends OpMode {
         fr = hardwareMap.get(DcMotor.class, "fr");
         fl = hardwareMap.get(DcMotor.class, "fl");
         bl = hardwareMap.get(DcMotor.class, "bl");
+
+        th_intake = new ThreadHandler();
+        th_intakeTilt = new ThreadHandler();
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        intakeTilt = hardwareMap.get(DcMotor.class, "intakeTilt");
        /* wrist = hardwareMap.get(Servo.class, "wrist");
         claw = hardwareMap.get(Servo.class, "claw");
         horizSlideLeft = hardwareMap.get(CRServo.class, "leftSlide");
@@ -53,7 +58,91 @@ public abstract class ThreadTeleLib extends OpMode {
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//       intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     // add threads here
+
+    Thread test = new Thread(new Runnable() {
+        @Override
+        public void run() {
+
+            ElapsedTime time = new ElapsedTime();
+
+            time.reset();
+
+            while (time.milliseconds() < 350) {
+
+            }
+
+        }
+    });
+    Thread th_intakeUp = new Thread(new Runnable() {
+        @Override
+        public void run() {
+
+            ElapsedTime time = new ElapsedTime();
+
+            time.reset();
+
+            while (time.milliseconds() < 350) {
+
+            }
+
+            intake.setPower(1);
+
+            sleep(1000);
+        }
+    });
+
+    Thread th_intakeDown = new Thread(new Runnable() {
+        @Override
+        public void run() {
+
+            ElapsedTime time = new ElapsedTime();
+
+            time.reset();
+
+            while (time.milliseconds() < 350) {
+
+            }
+
+            intake.setPower(-1);
+
+            sleep(1000);
+        }
+    });
+    Thread th_intakeTiltDown = new Thread(new Runnable() {
+        @Override
+        public void run() {
+
+            ElapsedTime time = new ElapsedTime();
+
+            time.reset();
+
+            while (time.milliseconds() < 350) {
+
+            }
+
+            intakeTilt.setPower(0);
+
+            sleep(1000);
+        }
+    });
+    Thread th_intakeTiltUp = new Thread(new Runnable() {
+        @Override
+        public void run() {
+
+            ElapsedTime time = new ElapsedTime();
+
+            time.reset();
+
+            while (time.milliseconds() < 350) {
+
+            }
+
+            intake.setPower(1);
+
+            sleep(1000);
+        }
+    });
 }
