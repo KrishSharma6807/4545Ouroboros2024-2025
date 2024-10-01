@@ -3,21 +3,21 @@ package org.firstinspires.ftc.teamcode.threadTeleOp;
 import static android.os.SystemClock.sleep;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
 import org.firstinspires.ftc.teamcode.ThreadHandler;
 
-import java.util.HashMap;
-//my change
 public abstract class ThreadTeleLib extends OpMode {
     public DcMotor br;
     public DcMotor bl;
     public DcMotor fr;
     public DcMotor fl;
+    public DcMotor intake;
+    public Servo intakeTilt;
+    public ThreadHandler th_intake;
+    public ThreadHandler th_intakeTilt;
     /*public CRServo horizSlideLeft;
     public CRServo horizSlideRight;
     public Servo intakeTilt;
@@ -32,6 +32,10 @@ public abstract class ThreadTeleLib extends OpMode {
         fr = hardwareMap.get(DcMotor.class, "fr");
         fl = hardwareMap.get(DcMotor.class, "fl");
         bl = hardwareMap.get(DcMotor.class, "bl");
+        intake = hardwareMap.get(DcMotor.class, "intake");
+        Servo intakeTilt = hardwareMap.get(Servo.class, "intakeTilt");
+        th_intake = new ThreadHandler();
+        th_intakeTilt = new ThreadHandler();
        /* wrist = hardwareMap.get(Servo.class, "wrist");
         claw = hardwareMap.get(Servo.class, "claw");
         horizSlideLeft = hardwareMap.get(CRServo.class, "leftSlide");
@@ -56,4 +60,42 @@ public abstract class ThreadTeleLib extends OpMode {
 //        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     // add threads here
+
+    Thread intake_in = new Thread(new Runnable() {
+
+        @Override
+        public void run() {
+
+            ElapsedTime time = new ElapsedTime();
+            time.reset();
+            while(time.milliseconds() < 300) {
+
+            }
+
+                intake.setPower(1);
+                sleep(1000);
+                intake.setPower(0);
+
+            }
+
+        });
+    Thread intake_Tilt = new Thread(new Runnable() {
+
+        @Override
+        public void run() {
+
+            ElapsedTime time = new ElapsedTime();
+            time.reset();
+            while(time.milliseconds() < 300) {
+
+            }
+
+            intakeTilt.setPosition(1);
+            intakeTilt.setPosition(0);
+
+        }
+
+    });
 }
+
+// fjdslkfklsdfjskldjsl
