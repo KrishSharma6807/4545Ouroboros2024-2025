@@ -6,6 +6,7 @@ public class TeleOp extends TeleLib{
     @Override
     public void loop(){
         ArcadeDrive();
+        
         //horizSlides();
         //intake();
         //Claw();
