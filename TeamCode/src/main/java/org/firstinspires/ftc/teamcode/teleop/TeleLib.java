@@ -62,12 +62,6 @@ public abstract class TeleLib extends OpMode {
             fl.setPower(((left_stick_y - left_stick_x) - right_stick_x));
             br.setPower(((left_stick_y - left_stick_x) + right_stick_x));
             bl.setPower(((left_stick_y + left_stick_x) - right_stick_x));
-        } else if (Math.abs(left_stick_x) > 0.1 ||
-                Math.abs(left_stick_y) >.1|| Math.abs(right_stick_x) > 0.1){
-            fr.setPower(((left_stick_y + left_stick_x) + right_stick_x));
-            fl.setPower(((left_stick_y - left_stick_x) - right_stick_x));
-            br.setPower(((left_stick_y - left_stick_x) + right_stick_x));
-            bl.setPower(((left_stick_y + left_stick_x) - right_stick_x));
         }
         else{
             fl.setPower(0);

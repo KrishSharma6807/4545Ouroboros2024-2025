@@ -14,6 +14,6 @@ public class TeleOp extends TeleLib{
 
     @Override
     public void kill(){
-        kill();
+        stop();
     }
 }

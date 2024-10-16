@@ -1,18 +1,19 @@
 package org.firstinspires.ftc.teamcode.threadTeleOp;
 
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+//import org.firstinspires.ftc.teamcode.teleop.TeleLib;
 
-@TeleOp
-
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class ThreadTeleOp extends ThreadTeleLib {
     @Override
-    public void loop() {
-        // add your threads here
-        
-
+    public void loop(){
+        ArcadeDrive();
+        intake();
+        horizSlides();
+        //Claw();
     }
 
-    public void kill(){
-        kill();
+    @Override
+    public void stop(){
+        stop();
     }
 }

@@ -70,7 +70,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
  */
 
 @TeleOp(name="Concept: IMU Orientation", group="Concept")
-@Disabled
+//@Disabled
 public class ConceptExploringIMUOrientation extends LinearOpMode {
     static RevHubOrientationOnRobot.LogoFacingDirection[] logoFacingDirections
             = RevHubOrientationOnRobot.LogoFacingDirection.values();
@@ -87,7 +87,7 @@ public class ConceptExploringIMUOrientation extends LinearOpMode {
     @Override public void runOpMode() throws InterruptedException {
         imu = hardwareMap.get(IMU.class, "imu");
         logoFacingDirectionPosition = 0; // Up
-        usbFacingDirectionPosition = 2; // Forward
+        usbFacingDirectionPosition = 3; // Forward is 2
 
         updateOrientation();
 
@@ -98,6 +98,7 @@ public class ConceptExploringIMUOrientation extends LinearOpMode {
         while (!isStopRequested()) {
 
             // Check to see if Yaw reset is requested (Y button)
+
             if (gamepad1.y) {
                 telemetry.addData("Yaw", "Resetting\n");
                 imu.resetYaw();
