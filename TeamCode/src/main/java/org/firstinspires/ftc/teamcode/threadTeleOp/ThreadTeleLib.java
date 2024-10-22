@@ -1,14 +1,20 @@
 package org.firstinspires.ftc.teamcode.threadTeleOp;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.ThreadHandler;
-
+@Config
 public abstract class ThreadTeleLib extends OpMode {
+    FtcDashboard dashboard;
+
     public DcMotor br;
     public DcMotor bl;
     public DcMotor fr;
@@ -19,19 +25,19 @@ public abstract class ThreadTeleLib extends OpMode {
 
     public Servo intakeTilt;
     public Servo claw;
-    public Servo intakeSlidesLeft;
-    public Servo intakeSlidesRight;
+    public CRServo intakeSlidesLeft;
+    public CRServo intakeSlidesRight;
     public Servo armLeft;
     public Servo armRight;
 
     public ThreadHandler th_intake;
     public ThreadHandler th_intakeTilt;
     public ThreadHandler th_outtake;
-
-    private final double kP = 0.01;
-    private final double kI = 0;
-    private final double kD = 0.002;
-    private final double kF = 0.1;
+    //TelemetryPacket
+    private static  double kP = 0.0012;
+    private static  double kI = 0;
+    private static  double kD = 0.000;
+    private static  double kF = 0.1;
 
     private double lowPass = 0;
     private final double a = 0.1;
@@ -60,8 +66,8 @@ public abstract class ThreadTeleLib extends OpMode {
 
         intakeTilt = hardwareMap.get(Servo.class, "intakeTilt");
         claw = hardwareMap.get(Servo.class, "claw");
-        intakeSlidesLeft = hardwareMap.get(Servo.class, "intakeSlidesLeft");
-        intakeSlidesRight = hardwareMap.get(Servo.class, "intakeSlidesRight");
+        intakeSlidesLeft = hardwareMap.get(CRServo.class, "intakeSlidesLeft");
+        intakeSlidesRight = hardwareMap.get(CRServo.class, "intakeSlidesRight");
 
         th_intake = new ThreadHandler();
         th_intakeTilt = new ThreadHandler();
@@ -85,6 +91,8 @@ public abstract class ThreadTeleLib extends OpMode {
         outtakeSlidesRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         outtakeSlidesRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         lowPass = outtakeSlidesLeft.getCurrentPosition();
+
+        dashboard = FtcDashboard.getInstance();
     }
     // add threads here
     Thread intakeExtend = new Thread(new Runnable() {
@@ -94,12 +102,12 @@ public abstract class ThreadTeleLib extends OpMode {
 
             ElapsedTime time = new ElapsedTime();
             time.reset();
-            while(time.milliseconds() < 300) {
+            while(time.milliseconds() < 100) {
 
             }
 
-            intakeSlidesLeft.setPosition(1);
-            intakeSlidesRight.setPosition(-1);
+            intakeSlidesLeft.setPower(1);
+            intakeSlidesRight.setPower(-1);
 
         }
 
@@ -112,12 +120,12 @@ public abstract class ThreadTeleLib extends OpMode {
 
             ElapsedTime time = new ElapsedTime();
             time.reset();
-            while(time.milliseconds() < 300) {
+            while(time.milliseconds() < 100) {
 
             }
 
-            intakeSlidesLeft.setPosition(-1);
-            intakeSlidesRight.setPosition(1);
+            intakeSlidesLeft.setPower(-1);
+            intakeSlidesRight.setPower(1);
 
         }
 
@@ -130,7 +138,7 @@ public abstract class ThreadTeleLib extends OpMode {
 
             ElapsedTime time = new ElapsedTime();
             time.reset();
-            while(time.milliseconds() < 300) {
+            while(time.milliseconds() < 100) {
 
             }
 
@@ -146,7 +154,7 @@ public abstract class ThreadTeleLib extends OpMode {
 
             ElapsedTime time = new ElapsedTime();
             time.reset();
-            while(time.milliseconds() < 300) {
+            while(time.milliseconds() < 100) {
 
             }
 
@@ -162,12 +170,12 @@ public abstract class ThreadTeleLib extends OpMode {
 
             ElapsedTime time = new ElapsedTime();
             time.reset();
-            while(time.milliseconds() < 300) {
+            while(time.milliseconds() < 100) {
 
             }
 
 
-            intakeTilt.setPosition(1);
+            intakeTilt.setPosition(.27);
 
         }
 
@@ -180,11 +188,11 @@ public abstract class ThreadTeleLib extends OpMode {
 
             ElapsedTime time = new ElapsedTime();
             time.reset();
-            while(time.milliseconds() < 300) {
+            while(time.milliseconds() < 100) {
 
             }
 
-            intakeTilt.setPosition(0);
+            intakeTilt.setPosition(.65);
 
             }
 
@@ -353,24 +361,52 @@ public abstract class ThreadTeleLib extends OpMode {
         telemetry.addData("rStickx:", right_stick_x);
         telemetry.addData("lStickx:", left_stick_x);
         telemetry.addData("lSticky:", left_stick_x);
+
+        telemetry.addData("intakeTilt:", intakeTilt.getPosition());
+
+        telemetry.addData("outtakeLeft",outtakeSlidesLeft.getPower());
+        telemetry.addData("outtakeRight",outtakeSlidesRight.getPower());
+
+        telemetry.addData("targ", lowPass);
+
+        telemetry.addData("targNoFilter", outtakeSlidesRight.getCurrentPosition());
+
         telemetry.update();
     }
 
     public void horizSlides() {
         if (gamepad2.left_bumper) {
-            th_intake.queue(intakeExtend);
-            th_intake.queue(intake_TiltDown);
+            intakeSlidesLeft.setPower(1);
+            intakeSlidesRight.setPower(-1);
+            intakeTilt.setPosition(.65);
         } else if (gamepad2.right_bumper) {
-            th_intake.queue(intake_TiltUp);
-            th_intake.queue(intakeRetract);
+            intakeSlidesLeft.setPower(-1);
+            intakeSlidesRight.setPower(1);
+        }
+        else{
+            intakeSlidesLeft.setPower(0);
+            intakeSlidesRight.setPower(0);
+        }
+
+    }
+
+    public void intakeTilt() {
+        if (gamepad2.a) {
+//            th_intake.queue(intake_TiltDown);
+            intakeTilt.setPosition(.65);
+            targetPosition = 700;
+            RunTOPos();
+        } else if (gamepad2.x) {
+//            th_intake.queue(intake_TiltUp);
+            intakeTilt.setPosition(.27);
         }
     }
 
     public void verticalSlides(){
-           if (gamepad2.left_stick_y > .2) {
+        /*   if (gamepad2.left_stick_y > .2) {
                th_outtake.queue(outtake_up);
            }
-           else if (intakeSlidesRight.getPosition() == 0 && gamepad2.left_stick_y < .2 ){
+           else if (/*intakeSlidesRight.getPosition() == 0 && gamepad2.left_stick_y < .2 ){
                th_outtake.queue(outtake_down_partial);
            }
            else if (gamepad2.left_stick_y < .2){
@@ -385,6 +421,20 @@ public abstract class ThreadTeleLib extends OpMode {
            else {
                holdPos();
            }
+
+         */
+        if(gamepad2.right_stick_y > .2){
+            outtakeSlidesLeft.setPower(1);
+            outtakeSlidesRight.setPower(-1);
+        }
+        else if (gamepad2.right_stick_y < -.2){
+            outtakeSlidesLeft.setPower(-1);
+            outtakeSlidesRight.setPower(1);
+        }
+        else{
+            targetPosition = outtakeSlidesRight.getCurrentPosition();
+            holdPos();
+        }
     }
 
     public void holdPos(){
@@ -397,9 +447,9 @@ public abstract class ThreadTeleLib extends OpMode {
         return;
         }
 
-        double position = outtakeSlidesLeft.getCurrentPosition();
+        double position = outtakeSlidesRight.getCurrentPosition();
 
-        lowPass = a * position + (1 - a) * lowPass;
+        lowPass = Math.abs(a * position + (1 - a) * lowPass);
 
         double error = targetPosition - lowPass;
         integralSum += error * timer.seconds();
@@ -412,10 +462,52 @@ public abstract class ThreadTeleLib extends OpMode {
         power = Math.max(-1.0, Math.min(1.0, power));  // Clamp power to [-1, 1]
 
         outtakeSlidesLeft.setPower(power);
-        outtakeSlidesRight.setPower(power);
+        outtakeSlidesRight.setPower(-power);
 
         previousError = error;
         timer.reset();
+    }
+
+    public void RunTOPos(){
+        double error = targetPosition - outtakeSlidesLeft.getCurrentPosition();
+        while(Math.abs(error) > 5) {
+            telemetry.addData("error", error);
+            telemetry.addData("outtakeLeft",outtakeSlidesLeft.getPower());
+            telemetry.addData("outtakeRight",outtakeSlidesRight.getPower());
+
+            telemetry.addData("targ", targetPosition);
+
+            telemetry.addData("CurrPosFiltered", lowPass);
+            telemetry.addData("CurrPos", outtakeSlidesLeft.getCurrentPosition());
+            telemetry.update();
+            double elapsedTime = timer.seconds();
+            timer.reset();
+
+            if (elapsedTime <= 0) {
+                outtakeSlidesLeft.setPower(0);
+                outtakeSlidesRight.setPower(0);
+                return;
+            }
+
+            double position = outtakeSlidesLeft.getCurrentPosition();
+
+            lowPass = a * position + (1 - a) * lowPass;
+
+            error = targetPosition - lowPass;
+            integralSum += error * timer.seconds();
+            integralSum = Math.max(-1.0, Math.min(1.0, integralSum));
+            double derivative = (error - previousError) / timer.seconds();
+
+            // Compute motor power
+            double power = (kP * error) + (kI * integralSum) + (kD * derivative);
+            power = Math.max(-1.0, Math.min(1.0, power));  // Clamp power to [-1, 1]
+
+            outtakeSlidesLeft.setPower(power);
+            outtakeSlidesRight.setPower(-power);
+
+            previousError = error;
+            timer.reset();
+        }
     }
 
     public void claw (){
@@ -429,12 +521,12 @@ public abstract class ThreadTeleLib extends OpMode {
 
     public void intake(){
         if(gamepad2.b){
-            //th_intake.queue(intake_in);
-            intake.setPower(1);
+            intake.setPower(-1);
+//            intake.setPower(1);
         }
         else if (gamepad2.y){
-           // th_intake.queue(intake_out);
-            intake.setPower(-1);
+            intake.setPower(1);
+//            intake.setPower(-1);
         }
         else{
             intake.setPower(0);

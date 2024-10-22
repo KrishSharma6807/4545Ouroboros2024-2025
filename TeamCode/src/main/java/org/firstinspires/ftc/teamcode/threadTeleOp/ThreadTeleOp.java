@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.threadTeleOp;
 
-//import org.firstinspires.ftc.teamcode.teleop.TeleLib;
+import com.acmerobotics.dashboard.config.Config;
 
+//import org.firstinspires.ftc.teamcode.teleop.TeleLib;
+@Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class ThreadTeleOp extends ThreadTeleLib {
     @Override
@@ -9,6 +11,8 @@ public class ThreadTeleOp extends ThreadTeleLib {
         ArcadeDrive();
         intake();
         horizSlides();
+        intakeTilt();
+        //verticalSlides();
         //Claw();
     }
 
