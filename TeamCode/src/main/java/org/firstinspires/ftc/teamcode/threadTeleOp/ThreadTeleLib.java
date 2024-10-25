@@ -22,12 +22,12 @@ public abstract class ThreadTeleLib extends OpMode {
     public ThreadHandler th_outtake;
     public DcMotor verticalSlideTop;
     public DcMotor verticalSlideBottom;
+    public Servo wrist;
     /*public CRServo horizSlideLeft;
     public CRServo horizSlideRight;
     public Servo intakeTilt;
     public DcMotor intake;
 
-    public Servo wrist;
     public Servo claw;*/
 
     public void init() {
@@ -45,8 +45,8 @@ public abstract class ThreadTeleLib extends OpMode {
         th_outtake = new ThreadHandler();
         verticalSlideTop = hardwareMap.get(DcMotor.class, "verticalSlideTop");
         verticalSlideBottom = hardwareMap.get(DcMotor.class, "verticalSlideBottom");
-       /* wrist = hardwareMap.get(Servo.class, "wrist");
-        claw = hardwareMap.get(Servo.class, "claw");
+        Servo wrist = hardwareMap.get(Servo.class, "wrist");
+        /*claw = hardwareMap.get(Servo.class, "claw");
         horizSlideLeft = hardwareMap.get(CRServo.class, "leftSlide");
         horizSlideRight = hardwareMap.get(CRServo.class, "rightSlide");
         intakeTilt = hardwareMap.get(Servo.class, "intakeTilt");
@@ -181,9 +181,25 @@ public abstract class ThreadTeleLib extends OpMode {
             verticalSlideBottom.setPower(1);
             verticalSlideTop.setPower(1);
 
-
         }
 
     });
+
+    Thread Wrist = new Thread(new Runnable() {
+
+        @Override
+        public void run() {
+
+            ElapsedTime time = new ElapsedTime();
+            time.reset();
+            while (time.milliseconds() < 300) {
+
+            }
+
+            wrist.setPosition(-1);
+
+        }
+    });
 }
 
+//fhdsjkfhdskjfhudsifhusid
