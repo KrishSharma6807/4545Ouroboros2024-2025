@@ -12,9 +12,9 @@ public abstract class TeleLib extends OpMode {
     public DcMotor bl;
     public DcMotor fr;
     public DcMotor fl;
-    /*public CRServo horizSlideLeft;
+    public CRServo horizSlideLeft;
     public CRServo horizSlideRight;
-    public Servo intakeTilt;
+    /*public Servo intakeTilt;
     public DcMotor intake;
 
     public Servo wrist;
@@ -26,11 +26,11 @@ public abstract class TeleLib extends OpMode {
         fr = hardwareMap.get(DcMotor.class, "fr");
         fl = hardwareMap.get(DcMotor.class, "fl");
         bl = hardwareMap.get(DcMotor.class, "bl");
-       /* wrist = hardwareMap.get(Servo.class, "wrist");
-        claw = hardwareMap.get(Servo.class, "claw");
-        horizSlideLeft = hardwareMap.get(CRServo.class, "leftSlide");
-        horizSlideRight = hardwareMap.get(CRServo.class, "rightSlide");
-        intakeTilt = hardwareMap.get(Servo.class, "intakeTilt");
+//        wrist = hardwareMap.get(Servo.class, "wrist");
+//        claw = hardwareMap.get(Servo.class, "claw");
+        horizSlideLeft = hardwareMap.get(CRServo.class, "intakeSlidesLeft");
+        horizSlideRight = hardwareMap.get(CRServo.class, "intakeSlidesRight");
+        /*intakeTilt = hardwareMap.get(Servo.class, "intakeTilt");
         intake = hardwareMap.get(DcMotor.class, "intake");*/
 
         br.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -74,12 +74,23 @@ public abstract class TeleLib extends OpMode {
         telemetry.addData("bl:", bl.getPower());
     }
 
-   /* public void horizSlides(){
-        if (Math.abs(gamepad2.left_stick_y) > 0.2){
-            horizSlideLeft.setPower(gamepad2.left_stick_y);
-            horizSlideRight.setPower(gamepad2.left_stick_y);
+    public void horizSlides() {
+
+        if (gamepad2.left_trigger > .2) {
+            horizSlideLeft.setPower(1);
+            horizSlideRight.setPower(-1);
+            //intakeTilt.setPosition(.65);
+        } else if (gamepad2.right_trigger > .2) {
+            horizSlideLeft.setPower(-1);
+            horizSlideRight.setPower(1);
         }
+        else {
+            horizSlideLeft.setPower(0);
+            horizSlideRight.setPower(0);
+        }
+
     }
+    /*
 
     public void intake(){
         if (gamepad2.right_trigger > 0.1){

@@ -7,7 +7,7 @@ public class TeleOp extends TeleLib{
     public void loop(){
         ArcadeDrive();
         
-        //horizSlides();
+        horizSlides();
         //intake();
         //Claw();
     }

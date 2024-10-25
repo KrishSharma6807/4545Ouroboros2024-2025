@@ -8,11 +8,15 @@ import com.acmerobotics.dashboard.config.Config;
 public class ThreadTeleOp extends ThreadTeleLib {
     @Override
     public void loop(){
+        telem();
         ArcadeDrive();
         intake();
         horizSlides();
         intakeTilt();
-        //verticalSlides();
+        arm();
+        claw();
+
+        verticalSlides();
         //Claw();
     }
 
