@@ -37,7 +37,7 @@ public abstract class ThreadTeleLib extends OpMode {
     private static  double kP = 0.00174;
     private static  double kI = 0;
     private static  double kD = 0.0000012;
-    private static  double kF = 0.1;
+    private static  double kF = 0;
 
     private double lowPass = 0;
     private final double a = 0.1;
