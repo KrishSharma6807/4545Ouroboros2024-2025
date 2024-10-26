@@ -200,6 +200,54 @@ public abstract class ThreadTeleLib extends OpMode {
 
         }
     });
+
+    Thread Arm = new Thread(new Runnable() {
+
+        @Override
+        public void run() {
+
+            ElapsedTime time = new ElapsedTime();
+            time.reset();
+            while (time.milliseconds() < 300) {
+
+            }
+
+            arm.setPosition(-1);
+
+        }
+    });
+
+    Thread Claw = new Thread(new Runnable() {
+
+        @Override
+        public void run() {
+
+            ElapsedTime time = new ElapsedTime();
+            time.reset();
+            while (time.milliseconds() < 300) {
+
+            }
+
+            claw.setPosition(0);
+
+        }
+    });
+
+    Thread Outtake_Up_and_Forward = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            ElapsedTime time = new ElapsedTime();
+            time.reset();
+            while (time.milliseconds() < 300) {
+
+            }
+            claw.setPosition(0);
+            arm.setPosition(0);
+            verticalSlideBottom.setPower(1);
+            verticalSlideTop.setPower(1);
+            wrist.setPosition(0);
+
+        }
+    });
 }
 
-//fhdsjkfhdskjfhudsifhusid
