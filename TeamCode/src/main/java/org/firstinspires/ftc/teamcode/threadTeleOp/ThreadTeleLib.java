@@ -277,7 +277,7 @@ public abstract class ThreadTeleLib extends OpMode {
         if (gamepad2.x && intakeTilt.getPosition() != .65) {
            th_intake.queue(intake_TiltUp);
             //intakeTilt.setPosition(.65);
-//            //
+//
         } else if (gamepad2.x) {
             th_intake.queue(intake_TiltDown);
             //intakeTilt.setPosition(.27);
