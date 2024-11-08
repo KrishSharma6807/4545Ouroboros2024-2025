@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.ThreadHandler;
+import org.firstinspires.ftc.teamcode.robotControl.CustomPID;
+
 @Config
 public abstract class ThreadTeleLib extends OpMode {
     FtcDashboard dashboard;
@@ -36,15 +38,17 @@ public abstract class ThreadTeleLib extends OpMode {
     public ThreadHandler th_intakeTilt;
     public ThreadHandler th_outtake;
     //TelemetryPacket
-    private static  double kP = 0.0000174;
-    private static  double kI = 0;
-    private static  double kD = 0.0000012;
+    public static double kP = 0.004;
+    public static double kI = 0;
+    public static double kD = 0.00011;
+    CustomPID pidController = new CustomPID(kP, kI, kD, 0.0);
 
-    private static  double kPh = 0.00174;
-    private static  double kIh = 0;
-    private static  double kDh = 0.000012;
+    public static  double kPh = 0.001;
+    public static  double kIh = 0;
+    public static  double kDh = 0.0001;
+    CustomPID pidControllerHold = new CustomPID(kPh, kIh, kDh, kF);
 
-    private static  double kF = 0.01;
+    public static  double kF = 0.005;
 
     private double lowPass = 0;
     private final double a = 0.1;
@@ -53,13 +57,18 @@ public abstract class ThreadTeleLib extends OpMode {
     private double integralSum = 0;
     private double previousError = 0;
     private ElapsedTime timer = new ElapsedTime();
-    /*public CRServo horizSlideLeft;
-    public CRServo horizSlideRight;
-    public Servo intakeTilt;
-    public DcMotor intake;
+    private ElapsedTime timeOut = new ElapsedTime();
 
-    public Servo wrist;
-    public Servo claw;*/
+    boolean isArmDown = true;
+    boolean armTogglePressed = false;
+
+    boolean isIntakeTiltUp = false;
+    boolean intakeTiltTogglePressed = false;
+
+    boolean isClawClosed = false;
+    boolean clawTogglePressed = false;
+
+    private boolean targetPositionSet = false;
 
     public void init() {
 
@@ -115,11 +124,11 @@ public abstract class ThreadTeleLib extends OpMode {
             while(time.milliseconds() < 300) {
 
             }
-
+                armLeft.setPosition(.6);
+                wristLeft.setPosition(.7);
                 targetPosition = -2500;
                 RunTOPos();
-                armLeft.setPosition(.6);
-                wristLeft.setPosition(1);
+
 
             }
 
@@ -136,13 +145,10 @@ public abstract class ThreadTeleLib extends OpMode {
 
             }
 
-            targetPosition = -10;
-            RunTOPos();
-            claw.setPosition(1);
             armLeft.setPosition(.15);
             wristLeft.setPosition(0);
-
-
+            targetPosition = -10;
+            RunTOPos();
         }
 
     });
@@ -229,6 +235,8 @@ public abstract class ThreadTeleLib extends OpMode {
         telemetry.addData("intakeSlidesLeft", intakeSlidesLeft.getPower());
         telemetry.addData("intakeSlidesRight", intakeSlidesRight.getPower());
 
+        telemetry.addData("claw", claw.getPosition());
+
         telemetry.addData("armLeftPos", armLeft.getPosition());
         telemetry.addData("armRightPos", armRight.getPosition());
         telemetry.addData("wristLeftPos", wristLeft.getPosition());
@@ -274,65 +282,85 @@ public abstract class ThreadTeleLib extends OpMode {
     }
 
     public void intakeTilt() {
-        if (gamepad2.x && intakeTilt.getPosition() != .65) {
-           th_intake.queue(intake_TiltUp);
-            //intakeTilt.setPosition(.65);
 
-        } else if (gamepad2.x) {
-            th_intake.queue(intake_TiltDown);
-            //intakeTilt.setPosition(.27);
+        if (gamepad2.x && !intakeTiltTogglePressed) {
+            intakeTiltTogglePressed = true;
+
+            if (isIntakeTiltUp) {
+                intakeTilt.setPosition(0.27);
+            } else {
+                intakeTilt.setPosition(0.65);
+            }
+
+            isIntakeTiltUp = !isIntakeTiltUp;
+        } else if (!gamepad2.x) {
+            intakeTiltTogglePressed = false;
         }
+
     }
 
     public void verticalSlides(){
-        if(gamepad2.right_stick_y > .2){
-            outtakeSlidesLeft.setPower(1);
-            outtakeSlidesRight.setPower(-1);
-        }
-        else if (gamepad2.right_stick_y < -.2){
-            outtakeSlidesLeft.setPower(-1);
-            outtakeSlidesRight.setPower(1);
-        }
-        else if (gamepad2.dpad_up){
-            th_outtake.queue(outtake_up_high_bucket);
-        }
-        else if (gamepad2.dpad_down){
-            th_outtake.queue(outtake_down);
-        }
-        else{
-            targetPosition = -outtakeSlidesRight.getCurrentPosition();
-            //holdPos();
-            outtakeSlidesLeft.setPower(0);
-            outtakeSlidesRight.setPower(0);
-        }
+
+            if (gamepad2.left_stick_y > .2) {
+                outtakeSlidesLeft.setPower(1);
+                outtakeSlidesRight.setPower(-1);
+                targetPositionSet = false;
+            }
+            else if (gamepad2.left_stick_y < -.2) {
+                outtakeSlidesLeft.setPower(-1);
+                outtakeSlidesRight.setPower(1);
+                targetPositionSet = false;
+            }
+            else if (gamepad2.dpad_up) {
+//                armLeft.setPosition(.6);
+//                wristLeft.setPosition(.7);
+//                targetPositionSet = false;
+                th_outtake.queue(outtake_up_high_bucket);
+            }
+            else if (gamepad2.dpad_down) {
+                th_outtake.queue(outtake_down);
+                targetPositionSet = false;
+            }
+            else {
+                if (!targetPositionSet) {
+                    targetPosition = outtakeSlidesLeft.getCurrentPosition();
+                    targetPositionSet = true;
+                }
+                holdPos();
+            }
+
     }
 
 
 
     public void claw (){
-        boolean bumperPressed = false;
-        if(gamepad2.left_bumper ){
-            claw.setPosition(0);
-        }
-        else if (gamepad2.right_bumper){
-            claw.setPosition(1);
+
+        if (gamepad2.right_bumper) {
+            claw.setPosition(.9); // Close claw
+        } else if (gamepad2.left_bumper) {
+            claw.setPosition(0.7); // Open claw
         }
     }
 
     public void arm(){
-        if(gamepad2.a && armLeft.getPosition() != 0.1 /*armRight.getPosition() != 0*/){
-            armLeft.setPosition(.15); //is down
-            //armRight.setPosition(0);
+        if (gamepad2.a && !armTogglePressed) {
+            armTogglePressed = true;
 
-            wristLeft.setPosition(0);
-            //wristRight.setPosition(0);
-        }
-        else if (gamepad2.a){
-            armLeft.setPosition(.8); //is up
-            //armRight.setPosition(1);
+            if (isArmDown) {
+                armLeft.setPosition(0.8);
+                wristLeft.setPosition(1);
+            } else {
+                claw.setPosition(0);
+                armLeft.setPosition(0);
+//                wristLeft.getController().pwmEnable();
+                wristLeft.setPosition(0);
+            }
 
-            wristLeft.setPosition(1);
+            isArmDown = !isArmDown;
+        } else if (!gamepad2.a) {
+            armTogglePressed = false;
         }
+
     }
 
     public void wrist(){
@@ -347,11 +375,9 @@ public abstract class ThreadTeleLib extends OpMode {
     public void intake(){
         if(gamepad2.b){
             intake.setPower(-1);
-//            intake.setPower(1);
         }
         else if (gamepad2.y){
             intake.setPower(1);
-//            intake.setPower(-1);
         }
         else{
             intake.setPower(0);
@@ -360,97 +386,79 @@ public abstract class ThreadTeleLib extends OpMode {
 
     public void holdPos(){
 
-        double elapsedTime = timer.seconds();
-        timer.reset();
+        pidController.timer.reset();  // Reset the PID controller's internal timer
 
-        if (elapsedTime <= 0) {
-            outtakeSlidesLeft.setPower(0);
-            outtakeSlidesRight.setPower(0);
-            return;
-        }
 
-        double position = outtakeSlidesRight.getCurrentPosition();
+        // Get current position
+        double currentPos = outtakeSlidesLeft.getCurrentPosition();
+        double error = targetPosition - currentPos;
 
-        lowPass = Math.abs(a * position + (1 - a) * lowPass);
-
-        double error = targetPosition - lowPass;
-        integralSum += error * timer.seconds();
-        integralSum = Math.max(-1.0, Math.min(1.0, integralSum));
-        double derivative = (error - previousError) / timer.seconds();
-        double feedforward = kF * targetPosition;
-
-        // Compute motor power
-        double power = (kPh * error) + (kIh * integralSum) + (kDh * derivative) + feedforward;
-        power = Math.max(-1.0, Math.min(1.0, power));  // Clamp power to [-1, 1]
-
-        outtakeSlidesLeft.setPower(power);
-        outtakeSlidesRight.setPower(-power);
-
-        previousError = error;
-        timer.reset();
-
-        telemetry.addData("error", error);
-        telemetry.addData("outtakeLeft",outtakeSlidesLeft.getPower());
-        telemetry.addData("outtakeRight",outtakeSlidesRight.getPower());
-
-        telemetry.addData("targ", targetPosition);
-
-        telemetry.addData("CurrPosFiltered", lowPass);
-        telemetry.addData("CurrPos", outtakeSlidesLeft.getCurrentPosition());
+        // Update telemetry
+        telemetry.addData("Error", error);
+        telemetry.addData("Target Position", targetPosition);
+        telemetry.addData("Current Position", currentPos);
+        telemetry.addData("Filtered Position", pidController.lowPass);
         telemetry.update();
 
+        // Calculate power to hold position using CustomPID controller
+        double power = pidControllerHold.calculatePower(targetPosition, currentPos);
+
+        power = Math.max(-1.0, Math.min(1.0, power));
+
+        // Set motor power to hold position
+        outtakeSlidesLeft.setPower(power);
+        outtakeSlidesRight.setPower(-power);
     }
 
     public void RunTOPos(){
-        double error = targetPosition - outtakeSlidesLeft.getCurrentPosition();
-        while(Math.abs(error) > 5) {
-            telemetry.addData("error", error);
-            telemetry.addData("outtakeLeft",outtakeSlidesLeft.getPower());
-            telemetry.addData("outtakeRight",outtakeSlidesRight.getPower());
+        timeOut.reset();
+        pidController.timer.reset();  // Reset the PID controller's internal timer
 
-            telemetry.addData("targ", targetPosition);
+        while (timeOut.seconds() < 2) {
+            // Current position and target error
+            double currentPos = outtakeSlidesLeft.getCurrentPosition();
+            double error = targetPosition - currentPos;
 
-            telemetry.addData("CurrPosFiltered", lowPass);
-            telemetry.addData("CurrPos", outtakeSlidesLeft.getCurrentPosition());
+            // Update telemetry
+            telemetry.addData("Error", error);
+            telemetry.addData("Target Position", targetPosition);
+            telemetry.addData("Current Position", currentPos);
+            telemetry.addData("Filtered Position", pidController.lowPass);
             telemetry.update();
-            double elapsedTime = timer.seconds();
-            timer.reset();
 
-            if (elapsedTime <= 0) {
-                outtakeSlidesLeft.setPower(0);
-                outtakeSlidesRight.setPower(0);
-                return;
-            }
+            // Calculate power using CustomPID controller
+            double power = pidController.calculatePower(targetPosition, currentPos);
 
-            double position = outtakeSlidesLeft.getCurrentPosition();
+            power = Math.max(-1.0, Math.min(1.0, power));
 
-            lowPass = a * position + (1 - a) * lowPass;
-
-            error = targetPosition - lowPass;
-            integralSum += error * timer.seconds();
-            integralSum = Math.max(-1.0, Math.min(1.0, integralSum));
-            double derivative = (error - previousError) / timer.seconds();
-
-            // Compute motor power
-            double power = (kP * error) + (kI * integralSum) + (kD * derivative);
-            power = Math.max(-1.0, Math.min(1.0, power));  // Clamp power to [-1, 1]
-
+            // Set motor power
             outtakeSlidesLeft.setPower(power);
             outtakeSlidesRight.setPower(-power);
 
-            previousError = error;
-            timer.reset();
+            // Check if error is within tolerance
+            if (Math.abs(error) <= 5) {
+                break;  // Exit loop if within tolerance
+            }
         }
+        targetPosition = outtakeSlidesLeft.getCurrentPosition();
+        holdPos();
     }
 
+
+
     public void stop(){
+        th_intake.th_kill();
+        th_outtake.th_kill();
+        th_intakeTilt.th_kill();
+
         bl.setPower(0);
         fl.setPower(0);
         br.setPower(0);
         fr.setPower(0);
+        intake.setPower(0);
+        outtakeSlidesLeft.setPower(0);
+        outtakeSlidesRight.setPower(0);
     }
 
 
 }
-
-// fdsfdsfssdddddddsdff
