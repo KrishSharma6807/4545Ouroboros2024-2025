@@ -38,14 +38,14 @@ public abstract class ThreadTeleLib extends OpMode {
     public ThreadHandler th_intakeTilt;
     public ThreadHandler th_outtake;
     //TelemetryPacket
-    public static double kP = 0.004;
+    public static double kP = 0;
     public static double kI = 0;
-    public static double kD = 0.00011;
+    public static double kD = 0;
     CustomPID pidController = new CustomPID(kP, kI, kD, 0.0);
 
-    public static  double kPh = 0.001;
+    public static  double kPh = .00001;
     public static  double kIh = 0;
-    public static  double kDh = 0.0001;
+    public static  double kDh = 0;
     CustomPID pidControllerHold = new CustomPID(kPh, kIh, kDh, kF);
 
     public static  double kF = 0.005;
