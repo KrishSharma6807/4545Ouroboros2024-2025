@@ -4,7 +4,7 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 //import org.firstinspires.ftc.teamcode.teleop.TeleLib;
-@Config
+//@Config
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class ThreadTeleOp extends ThreadTeleLib {
 
