@@ -19,14 +19,15 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.messages.TwoDeadWheelInputsMessage;
 
 @Config
 public final class TwoDeadWheelLocalizer implements Localizer {
     public static class Params {
-        public double parYTicks = -3629.35425843459; // y position of the parallel encoder (in tick units)
-        public double perpXTicks = 538.2509949098992; // x position of the perpendicular encoder (in tick units)
+        public double parYTicks = -3697.5633414072063; // y position of the parallel encoder (in tick units)
+        public double perpXTicks = 431.2365128686632; // x position of the perpendicular encoder (in tick units)
     }
 
     public static Params PARAMS = new Params();
@@ -50,8 +51,9 @@ public final class TwoDeadWheelLocalizer implements Localizer {
         perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "br")));
 
         // TODO: reverse encoder directions if needed
-           par.setDirection(DcMotorSimple.Direction.REVERSE);
-           perp.setDirection(DcMotorSimple.Direction.REVERSE);
+        //   par.setDirection(DcMotorSimple.Direction.REVERSE);
+        par.setDirection(DcMotorSimple.Direction.REVERSE);
+        perp.setDirection(DcMotorSimple.Direction.REVERSE);
 
         this.imu = imu;
 
@@ -65,7 +67,15 @@ public final class TwoDeadWheelLocalizer implements Localizer {
         PositionVelocityPair perpPosVel = perp.getPositionAndVelocity();
 
         YawPitchRollAngles angles = imu.getRobotYawPitchRollAngles();
-        AngularVelocity angularVelocity = imu.getRobotAngularVelocity(AngleUnit.RADIANS);
+        // Use degrees here to work around https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/1070
+        AngularVelocity angularVelocityDegrees = imu.getRobotAngularVelocity(AngleUnit.DEGREES);
+        AngularVelocity angularVelocity = new AngularVelocity(
+                UnnormalizedAngleUnit.RADIANS,
+                (float) Math.toRadians(angularVelocityDegrees.xRotationRate),
+                (float) Math.toRadians(angularVelocityDegrees.yRotationRate),
+                (float) Math.toRadians(angularVelocityDegrees.zRotationRate),
+                angularVelocityDegrees.acquisitionTime
+        );
 
         FlightRecorder.write("TWO_DEAD_WHEEL_INPUTS", new TwoDeadWheelInputsMessage(parPosVel, perpPosVel, angles, angularVelocity));
 

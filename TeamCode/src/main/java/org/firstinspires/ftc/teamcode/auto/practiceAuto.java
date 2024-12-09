@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 @Autonomous
-public abstract class practiceAuto extends LinearOpMode {
+public class practiceAuto extends LinearOpMode {
     ElapsedTime timer = new ElapsedTime();
     public DcMotor br;
 
@@ -21,8 +21,9 @@ public abstract class practiceAuto extends LinearOpMode {
     public DcMotor fl;
 
     @Override
-    public void runOpMode() throws InterruptedException {
-        timer.reset();
+    public void runOpMode(){
+        telemetry.addData("Initialized", 1);
+        telemetry.update();
         br = hardwareMap.get(DcMotor.class, "br");
         fr = hardwareMap.get(DcMotor.class, "fr");
         fl = hardwareMap.get(DcMotor.class, "fl");
@@ -33,12 +34,12 @@ public abstract class practiceAuto extends LinearOpMode {
         fr.setDirection(DcMotorSimple.Direction.REVERSE);
         fl.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        telemetry.addData("here", 1);
-        telemetry.update();
+
 
         waitForStart();
-        if (!isStopRequested()) {
-            while (opModeIsActive() && timer.seconds() < 3) {
+        timer.reset();
+        while (opModeIsActive()) {
+            while (timer.seconds() < .5) {
                 bl.setPower(1);
                 br.setPower(1);
                 fr.setPower(1);

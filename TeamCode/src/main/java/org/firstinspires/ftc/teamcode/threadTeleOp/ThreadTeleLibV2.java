@@ -2,9 +2,11 @@ package org.firstinspires.ftc.teamcode.threadTeleOp;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -12,22 +14,24 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.ThreadHandler;
 import org.firstinspires.ftc.teamcode.robotControl.CustomPID;
 
+import java.util.List;
+
 @Config
-public abstract class ThreadTeleLib extends OpMode {
+public abstract class ThreadTeleLibV2 extends OpMode {
     FtcDashboard dashboard;
 
-    public DcMotor br;
-    public DcMotor bl;
-    public DcMotor fr;
-    public DcMotor fl;
-    public DcMotor intake;
-    public DcMotor outtakeSlidesRight;
-    public DcMotor outtakeSlidesLeft;
+    public DcMotorEx br;
+    public DcMotorEx bl;
+    public DcMotorEx fr;
+    public DcMotorEx fl;
+    public DcMotorEx intake;
+    public DcMotorEx outtakeSlidesRight;
+    public DcMotorEx outtakeSlidesLeft;
+    public CRServo intakeSlidesLeft;
+    public CRServo intakeSlidesRight;
 
     public Servo intakeTilt;
     public Servo claw;
-    public CRServo intakeSlidesLeft;
-    public CRServo intakeSlidesRight;
     public Servo armLeft;
     public Servo armRight;
     public Servo wristRight;
@@ -69,15 +73,30 @@ public abstract class ThreadTeleLib extends OpMode {
 
     private boolean targetPositionSet = false;
 
+    double outtakeSlidesLeftPosition = 0.0;
+    double outtakeSlidesRightPosition = 0.0;
+    double intakeSlidesRightPosition = 0.0;
+    double intakeSlidesLeftPosition = 0.0;
+
+    double voltage = 0;
+
+    public enum OuttakeLiftState {
+        LIFT_SAMPLE_HIGH,
+        LIFT_SAMPLE_LOW,
+        LIFT_SPECIMEN_PICKUP,
+        LIFT_SPECIMEN_HIGH,
+        LIFT_SPECIMEN_LOW
+    };
+
     public void init() {
 
-        br = hardwareMap.get(DcMotor.class, "br");
-        fr = hardwareMap.get(DcMotor.class, "fr");
-        fl = hardwareMap.get(DcMotor.class, "fl");
-        bl = hardwareMap.get(DcMotor.class, "bl");
-        intake = hardwareMap.get(DcMotor.class, "intake");
-        outtakeSlidesRight = hardwareMap.get(DcMotor.class, "outtakeSlidesRight");
-        outtakeSlidesLeft = hardwareMap.get(DcMotor.class, "outtakeSlidesLeft");
+        br = hardwareMap.get(DcMotorEx.class, "br");
+        fr = hardwareMap.get(DcMotorEx.class, "fr");
+        fl = hardwareMap.get(DcMotorEx.class, "fl");
+        bl = hardwareMap.get(DcMotorEx.class, "bl");
+        intake = hardwareMap.get(DcMotorEx.class, "intake");
+        outtakeSlidesRight = hardwareMap.get(DcMotorEx.class, "outtakeSlidesRight");
+        outtakeSlidesLeft = hardwareMap.get(DcMotorEx.class, "outtakeSlidesLeft");
 
         intakeTilt = hardwareMap.get(Servo.class, "intakeTilt");
         claw = hardwareMap.get(Servo.class, "claw");
@@ -92,7 +111,6 @@ public abstract class ThreadTeleLib extends OpMode {
         th_intakeTilt = new ThreadHandler();
         th_outtake = new ThreadHandler();
 
-
         br.setDirection(DcMotorSimple.Direction.REVERSE);
         bl.setDirection(DcMotorSimple.Direction.FORWARD);
         fr.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -102,14 +120,27 @@ public abstract class ThreadTeleLib extends OpMode {
         bl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         outtakeSlidesLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         outtakeSlidesLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+//        intakeSlidesLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        intakeSlidesLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         outtakeSlidesRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         outtakeSlidesRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+//        intakeSlidesRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//        intakeSlidesRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        outtakeSlidesLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        outtakeSlidesRight.setDirection(DcMotorSimple.Direction.FORWARD);
+
+//        intakeSlidesLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+//        intakeSlidesRight.setDirection(DcMotorSimple.Direction.FORWARD);
+
         lowPass = outtakeSlidesLeft.getCurrentPosition();
+
     }
     // add threads here
 
@@ -123,13 +154,13 @@ public abstract class ThreadTeleLib extends OpMode {
             while(time.milliseconds() < 300) {
 
             }
-            armLeft.setPosition(.6);
-            wristLeft.setPosition(.7);
-            targetPosition = -2500;
-            RunTOPos();
+                armLeft.setPosition(.6);
+                wristLeft.setPosition(.7);
+                targetPosition = -2500;
+                RunTOPos();
 
 
-        }
+            }
 
     });
 
@@ -152,61 +183,18 @@ public abstract class ThreadTeleLib extends OpMode {
 
     });
 
-    Thread outtake_down_partial = new Thread(new Runnable() {
+    public void update(){
+        List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
-        @Override
-        public void run() {
-
-            ElapsedTime time = new ElapsedTime();
-            time.reset();
-            while(time.milliseconds() < 300) {
-
-            }
-
-            armLeft.setPosition(0);
-            armRight.setPosition(0);
-            outtakeSlidesLeft.setPower(-1);
-            outtakeSlidesRight.setPower(-1);
-
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-    });
-
-    Thread intake_TiltUp = new Thread(new Runnable() {
-
-        @Override
-        public void run() {
-
-            ElapsedTime time = new ElapsedTime();
-            time.reset();
-            while(time.milliseconds() < 10) {
-
-            }
-
-            intakeTilt.setPosition(.65);
-
-        }
-
-    });
-
-    Thread intake_TiltDown = new Thread(new Runnable() {
-
-        @Override
-        public void run() {
-
-            ElapsedTime time = new ElapsedTime();
-            time.reset();
-            while(time.milliseconds() < 10) {
-
-            }
-
-            intakeTilt.setPosition(.27);
-
-        }
-
-    });
-
-
+        outtakeSlidesLeftPosition = outtakeSlidesLeft.getCurrentPosition();
+        outtakeSlidesRightPosition = outtakeSlidesRight.getCurrentPosition();
+//        intakeSlidesRightPosition = intakeSlidesRight.getCurrentPosition();
+//        intakeSlidesLeftPosition = intakeSlidesLeft.getCurrentPosition();
+    }
 
     public void telem(){
         telemetry.addData("fr:", fr.getPower());
@@ -239,7 +227,6 @@ public abstract class ThreadTeleLib extends OpMode {
         telemetry.addData("armLeftPos", armLeft.getPosition());
         telemetry.addData("armRightPos", armRight.getPosition());
         telemetry.addData("wristLeftPos", wristLeft.getPosition());
-        telemetry.addData("2a", gamepad2.a);
         telemetry.update();
     }
     public void ArcadeDrive() {
@@ -248,14 +235,16 @@ public abstract class ThreadTeleLib extends OpMode {
         double left_stick_y = gamepad1.left_stick_y;
         double right_stick_x = gamepad1.right_stick_x;
 
+        voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
+
         double denominator = Math.max(Math.abs(gamepad1.left_stick_y) + Math.abs(gamepad1.left_stick_x) + Math.abs(gamepad1.right_stick_x), 1);
 
         if (Math.abs(left_stick_x) > 0.1 ||
                 Math.abs(left_stick_y) >.1|| Math.abs(right_stick_x) > 0.1){
-            fr.setPower(((left_stick_y + left_stick_x) + right_stick_x) / denominator);
-            fl.setPower(((left_stick_y - left_stick_x) - right_stick_x) / denominator);
-            br.setPower(((left_stick_y - left_stick_x) + right_stick_x) / denominator);
-            bl.setPower(((left_stick_y + left_stick_x) - right_stick_x) / denominator);
+            fr.setPower(voltage/13.5 * ((left_stick_y + left_stick_x) + right_stick_x));
+            fl.setPower(voltage/13.5 * ((left_stick_y - left_stick_x) - right_stick_x));
+            br.setPower(voltage/13.5 * ((left_stick_y - left_stick_x) + right_stick_x));
+            bl.setPower(voltage/13.5 * ((left_stick_y + left_stick_x) - right_stick_x));
         }
         else{
             fl.setPower(0);
@@ -267,13 +256,13 @@ public abstract class ThreadTeleLib extends OpMode {
 
     public void horizSlides() {
 
-        if (gamepad2.left_trigger > .2) {
-            intakeSlidesLeft.setPower(1);
-            intakeSlidesRight.setPower(-1);
+         if (gamepad2.left_trigger > .2) {
+            intakeSlidesLeft.setPower(gamepad2.left_trigger);
+            intakeSlidesRight.setPower(gamepad2.left_trigger);
             //intakeTilt.setPosition(.65);
         } else if (gamepad2.right_trigger > .2) {
-            intakeSlidesLeft.setPower(-1);
-            intakeSlidesRight.setPower(1);
+            intakeSlidesLeft.setPower(gamepad2.right_trigger);
+            intakeSlidesRight.setPower(gamepad2.right_trigger);
         }
         else {
             intakeSlidesLeft.setPower(0);
@@ -302,37 +291,32 @@ public abstract class ThreadTeleLib extends OpMode {
 
     public void verticalSlides(){
 
-        if (gamepad2.left_stick_y > .2) {
-            outtakeSlidesLeft.setPower(1);
-            outtakeSlidesRight.setPower(-1);
-            targetPositionSet = false;
-        }
-        else if (gamepad2.left_stick_y < -.2) {
-            outtakeSlidesLeft.setPower(-1);
-            outtakeSlidesRight.setPower(1);
-            targetPositionSet = false;
-        }
-        else if (gamepad2.dpad_up) {
-//                armLeft.setPosition(.6);
-//                wristLeft.setPosition(.7);
-//                targetPositionSet = false;
-            th_outtake.queue(outtake_up_high_bucket);
-        }
-        else if (gamepad2.dpad_down) {
-            th_outtake.queue(outtake_down);
-            targetPositionSet = false;
-        }
-        else {
-            if (!targetPositionSet) {
-                targetPosition = outtakeSlidesLeft.getCurrentPosition();
-                targetPositionSet = true;
+            if (gamepad2.left_stick_y > .2) {
+                outtakeSlidesLeft.setPower(gamepad2.left_stick_y);
+                outtakeSlidesRight.setPower(gamepad2.left_stick_y);
+                targetPositionSet = false;
             }
-            holdPos();
-        }
+            else if (gamepad2.left_stick_y < -.2) {
+                outtakeSlidesLeft.setPower(gamepad2.left_stick_y);
+                outtakeSlidesRight.setPower(gamepad2.left_stick_y);
+                targetPositionSet = false;
+            }
+            else if (gamepad2.dpad_up) {
+                th_outtake.queue(outtake_up_high_bucket);
+            }
+            else if (gamepad2.dpad_down) {
+                th_outtake.queue(outtake_down);
+                targetPositionSet = false;
+            }
+            else {
+                if (!targetPositionSet) {
+                    targetPosition = outtakeSlidesLeft.getCurrentPosition();
+                    targetPositionSet = true;
+                }
+                holdPos();
+            }
 
     }
-
-
 
     public void claw (){
 
@@ -391,7 +375,7 @@ public abstract class ThreadTeleLib extends OpMode {
 
 
         // Get current position
-        double currentPos = outtakeSlidesLeft.getCurrentPosition();
+        double currentPos = outtakeSlidesLeftPosition;
         double error = targetPosition - currentPos;
 
         // Update telemetry
@@ -408,7 +392,7 @@ public abstract class ThreadTeleLib extends OpMode {
 
         // Set motor power to hold position
         outtakeSlidesLeft.setPower(power);
-        outtakeSlidesRight.setPower(-power);
+        outtakeSlidesRight.setPower(power);
     }
 
     public void RunTOPos(){
@@ -417,7 +401,7 @@ public abstract class ThreadTeleLib extends OpMode {
 
         while (timeOut.seconds() < 2) {
             // Current position and target error
-            double currentPos = outtakeSlidesLeft.getCurrentPosition();
+            double currentPos = outtakeSlidesLeftPosition;
             double error = targetPosition - currentPos;
 
             // Update telemetry
@@ -433,8 +417,8 @@ public abstract class ThreadTeleLib extends OpMode {
             power = Math.max(-1.0, Math.min(1.0, power));
 
             // Set motor power
-            outtakeSlidesLeft.setPower(power);
-            outtakeSlidesRight.setPower(-power);
+            outtakeSlidesLeft.setPower(Math.sqrt(power));
+            outtakeSlidesRight.setPower(Math.sqrt(power));
 
             // Check if error is within tolerance
             if (Math.abs(error) <= 5) {
