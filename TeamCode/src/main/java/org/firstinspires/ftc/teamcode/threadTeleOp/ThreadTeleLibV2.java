@@ -27,15 +27,15 @@ public abstract class ThreadTeleLibV2 extends OpMode {
     public DcMotorEx intake;
     public DcMotorEx outtakeSlidesRight;
     public DcMotorEx outtakeSlidesLeft;
-    public CRServo intakeSlidesLeft;
-    public CRServo intakeSlidesRight;
+    public DcMotorEx intakeSlides;
 
-    public Servo intakeTilt;
+    public Servo intakeTiltLeft;
+    public Servo intakeTiltRight;
     public Servo claw;
     public Servo armLeft;
     public Servo armRight;
-    public Servo wristRight;
-    public Servo wristLeft;
+    public Servo wrist;
+    public Servo clawSpin;
 
     public ThreadHandler th_intake;
     public ThreadHandler th_intakeTilt;
@@ -80,6 +80,30 @@ public abstract class ThreadTeleLibV2 extends OpMode {
 
     double voltage = 0;
 
+    public static double armLeft1Sample = .35;
+    public static double armLeft2Sample = .87;//.9 is max
+
+    public static double armRight1Specimen = .1;
+    public static double armRight2Specimen = .9;
+
+    public static double armLeft1Specimen = .14;
+    public static double armLeft2Specimen = .5;//.9 is max
+
+    public static double armRight1Sample = .1;
+    public static double armRight2Sample = .9;
+
+    public static double closeClaw = .66;
+    public static double openClaw = .95;
+
+    public static double wrist1Specimen = 0;
+    public static double wrist2Specimen = 1;
+
+    public static double wrist1Sample = 0;
+    public static double wrist2Sample = 1;
+
+    public static double clawSpin1 = 0;
+    public static double clawSpin2 = .75;
+
     public enum OuttakeLiftState {
         LIFT_SAMPLE_HIGH,
         LIFT_SAMPLE_LOW,
@@ -97,19 +121,23 @@ public abstract class ThreadTeleLibV2 extends OpMode {
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         outtakeSlidesRight = hardwareMap.get(DcMotorEx.class, "outtakeSlidesRight");
         outtakeSlidesLeft = hardwareMap.get(DcMotorEx.class, "outtakeSlidesLeft");
+        intakeSlides = hardwareMap.get(DcMotorEx.class, "intakeSlides");
 
-        intakeTilt = hardwareMap.get(Servo.class, "intakeTilt");
+        intakeTiltLeft = hardwareMap.get(Servo.class, "intakeTiltLeft");
+        intakeTiltRight = hardwareMap.get(Servo.class, "intakeTiltRight");
         claw = hardwareMap.get(Servo.class, "claw");
         armLeft = hardwareMap.get(Servo.class, "armLeft");
         armRight = hardwareMap.get(Servo.class, "armRight");
-        wristLeft = hardwareMap.get(Servo.class, "wristLeft");
-        wristRight = hardwareMap.get(Servo.class, "wristRight");
-        intakeSlidesLeft = hardwareMap.get(CRServo.class, "intakeSlidesLeft");
-        intakeSlidesRight = hardwareMap.get(CRServo.class, "intakeSlidesRight");
+        wrist = hardwareMap.get(Servo.class, "wrist");
+        clawSpin = hardwareMap.get(Servo.class, "clawSpin");
+
 
         th_intake = new ThreadHandler();
         th_intakeTilt = new ThreadHandler();
         th_outtake = new ThreadHandler();
+
+        armRight.setDirection(Servo.Direction.REVERSE);
+        armLeft.setDirection(Servo.Direction.REVERSE);
 
         br.setDirection(DcMotorSimple.Direction.REVERSE);
         bl.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -133,8 +161,8 @@ public abstract class ThreadTeleLibV2 extends OpMode {
 //        intakeSlidesRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        intakeSlidesRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        outtakeSlidesLeft.setDirection(DcMotorSimple.Direction.REVERSE);
-        outtakeSlidesRight.setDirection(DcMotorSimple.Direction.FORWARD);
+        outtakeSlidesLeft.setDirection(DcMotorSimple.Direction.FORWARD);
+        outtakeSlidesRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
 //        intakeSlidesLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 //        intakeSlidesRight.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -143,7 +171,25 @@ public abstract class ThreadTeleLibV2 extends OpMode {
 
     }
     // add threads here
+    Thread outtake_up_high_specimen = new Thread(new Runnable() {
 
+        @Override
+        public void run() {
+
+            ElapsedTime time = new ElapsedTime();
+            time.reset();
+            while(time.milliseconds() < 300) {
+
+            }
+            armLeft.setPosition(.6);
+            wrist.setPosition(.7);
+            targetPosition = -2500;
+            RunTOPos();
+
+
+        }
+
+    });
     Thread outtake_up_high_bucket = new Thread(new Runnable() {
 
         @Override
@@ -155,12 +201,36 @@ public abstract class ThreadTeleLibV2 extends OpMode {
 
             }
                 armLeft.setPosition(.6);
-                wristLeft.setPosition(.7);
+                wrist.setPosition(.7);
                 targetPosition = -2500;
                 RunTOPos();
 
 
             }
+
+    });
+
+    Thread outtake_up_specimen= new Thread(new Runnable() {
+
+        @Override
+        public void run() {
+
+            ElapsedTime time = new ElapsedTime();
+            time.reset();
+            while(time.milliseconds() < 50) {
+
+            }
+
+            armLeft.setPosition(armLeft1Specimen);
+            armRight.setPosition(armRight1Specimen);
+            wrist.setPosition(wrist1Specimen);
+            while(time.milliseconds() < 400) {
+
+            }
+            clawSpin.setPosition(clawSpin1);
+
+
+        }
 
     });
 
@@ -176,7 +246,7 @@ public abstract class ThreadTeleLibV2 extends OpMode {
             }
 
             armLeft.setPosition(.15);
-            wristLeft.setPosition(0);
+            wrist.setPosition(0);
             targetPosition = -10;
             RunTOPos();
         }
@@ -206,10 +276,8 @@ public abstract class ThreadTeleLibV2 extends OpMode {
         telemetry.addData("lStickx:", gamepad1.left_stick_x);
         telemetry.addData("lSticky:", gamepad1.left_stick_x);
 
-        telemetry.addData("intakeTilt:", intakeTilt.getPosition());
-
-        telemetry.addData("outtakeLeft",outtakeSlidesLeft.getPower());
-        telemetry.addData("outtakeRight",outtakeSlidesRight.getPower());
+        telemetry.addData("intakeTiltLeft:", intakeTiltLeft.getPosition());
+        telemetry.addData("intakeTiltRight:", intakeTiltRight.getPosition());
 
         telemetry.addData("outtakeLeft",outtakeSlidesLeft.getPower());
         telemetry.addData("outtakeRight",outtakeSlidesRight.getPower());
@@ -219,14 +287,18 @@ public abstract class ThreadTeleLibV2 extends OpMode {
         telemetry.addData("CurrPosFiltered", lowPass);
         telemetry.addData("CurrPos", outtakeSlidesLeft.getCurrentPosition());
 
-        telemetry.addData("intakeSlidesLeft", intakeSlidesLeft.getPower());
-        telemetry.addData("intakeSlidesRight", intakeSlidesRight.getPower());
+        telemetry.addData("intakeSlides", intakeSlides.getPower());
+        telemetry.addData("intakeSlidesPos", intakeSlides.getCurrentPosition());
+
+        telemetry.addData("intake", intake.getPower());
 
         telemetry.addData("claw", claw.getPosition());
 
         telemetry.addData("armLeftPos", armLeft.getPosition());
         telemetry.addData("armRightPos", armRight.getPosition());
-        telemetry.addData("wristLeftPos", wristLeft.getPosition());
+        telemetry.addData("wristPos", wrist.getPosition());
+
+        telemetry.addData("clawSpin", clawSpin.getPosition());
         telemetry.update();
     }
     public void ArcadeDrive() {
@@ -257,16 +329,13 @@ public abstract class ThreadTeleLibV2 extends OpMode {
     public void horizSlides() {
 
          if (gamepad2.left_trigger > .2) {
-            intakeSlidesLeft.setPower(gamepad2.left_trigger);
-            intakeSlidesRight.setPower(gamepad2.left_trigger);
+            intakeSlides.setPower(-gamepad2.left_trigger);
             //intakeTilt.setPosition(.65);
         } else if (gamepad2.right_trigger > .2) {
-            intakeSlidesLeft.setPower(gamepad2.right_trigger);
-            intakeSlidesRight.setPower(gamepad2.right_trigger);
+            intakeSlides.setPower(gamepad2.right_trigger);
         }
         else {
-            intakeSlidesLeft.setPower(0);
-            intakeSlidesRight.setPower(0);
+            intakeSlides.setPower(0);
         }
 
     }
@@ -277,9 +346,11 @@ public abstract class ThreadTeleLibV2 extends OpMode {
             intakeTiltTogglePressed = true;
 
             if (isIntakeTiltUp) {
-                intakeTilt.setPosition(0.27);
+                intakeTiltLeft.setPosition(1);
+                intakeTiltRight.setPosition(0.27);
             } else {
-                intakeTilt.setPosition(0.65);
+                intakeTiltLeft.setPosition(.6);
+                intakeTiltRight.setPosition(0.85);
             }
 
             isIntakeTiltUp = !isIntakeTiltUp;
@@ -289,14 +360,14 @@ public abstract class ThreadTeleLibV2 extends OpMode {
 
     }
 
-    public void verticalSlides(){
+    public void verticalSlidesSample(){
 
-            if (gamepad2.left_stick_y > .2) {
+            if (gamepad2.left_stick_y < -.2) {
                 outtakeSlidesLeft.setPower(gamepad2.left_stick_y);
                 outtakeSlidesRight.setPower(gamepad2.left_stick_y);
                 targetPositionSet = false;
             }
-            else if (gamepad2.left_stick_y < -.2) {
+            else if (gamepad2.left_stick_y > .2) {
                 outtakeSlidesLeft.setPower(gamepad2.left_stick_y);
                 outtakeSlidesRight.setPower(gamepad2.left_stick_y);
                 targetPositionSet = false;
@@ -318,27 +389,75 @@ public abstract class ThreadTeleLibV2 extends OpMode {
 
     }
 
-    public void claw (){
+    public void verticalSlidesSpecimen() {
 
-        if (gamepad2.right_bumper) {
-            claw.setPosition(.9); // Close claw
-        } else if (gamepad2.left_bumper) {
-            claw.setPosition(0.7); // Open claw
+        if (gamepad2.left_stick_y < -.2) {
+            outtakeSlidesLeft.setPower(gamepad2.left_stick_y);
+            outtakeSlidesRight.setPower(gamepad2.left_stick_y);
+            targetPositionSet = false;
+        } else if (gamepad2.left_stick_y > .2) {
+            outtakeSlidesLeft.setPower(gamepad2.left_stick_y);
+            outtakeSlidesRight.setPower(gamepad2.left_stick_y);
+            targetPositionSet = false;
+        } else if (gamepad2.dpad_up) {
+            th_outtake.queue(outtake_up_high_specimen);
+        } else if (gamepad2.dpad_down) {
+            th_outtake.queue(outtake_down);
+            targetPositionSet = false;
+        } else {
+            if (!targetPositionSet) {
+                targetPosition = outtakeSlidesLeft.getCurrentPosition();
+                targetPositionSet = true;
+            }
+            holdPos();
         }
     }
 
-    public void arm(){
+    public void claw (){
+
+        if (gamepad2.right_bumper) {
+            claw.setPosition(openClaw);
+        } else if (gamepad2.left_bumper) {
+            claw.setPosition(closeClaw);
+        }
+    }
+
+
+
+    public void armSpecimen(){
         if (gamepad2.a && !armTogglePressed) {
             armTogglePressed = true;
 
             if (isArmDown) {
-                armLeft.setPosition(0.8);
-                wristLeft.setPosition(1);
+                th_outtake.queue(outtake_up_specimen);
             } else {
-                claw.setPosition(0);
-                armLeft.setPosition(0);
-//                wristLeft.getController().pwmEnable();
-                wristLeft.setPosition(0);
+                armLeft.setPosition(armLeft2Specimen);
+                armRight.setPosition(armRight2Specimen);
+//                wrist.getController().pwmEnable();
+                wrist.setPosition(wrist2Specimen);
+                clawSpin.setPosition(clawSpin2);
+            }
+
+            isArmDown = !isArmDown;
+        } else if (!gamepad2.a) {
+            armTogglePressed = false;
+        }
+
+    }
+
+    public void armSample(){
+        if (gamepad2.a && !armTogglePressed) {
+            armTogglePressed = true;
+
+            if (isArmDown) {
+                armLeft.setPosition(armLeft1Sample);
+                armRight.setPosition(armRight1Sample);
+                wrist.setPosition(wrist1Sample);
+            } else {
+                armLeft.setPosition(armLeft2Sample);
+                armRight.setPosition(armRight2Sample);
+//                wrist.getController().pwmEnable();
+                wrist.setPosition(wrist2Sample);
             }
 
             isArmDown = !isArmDown;
@@ -349,11 +468,11 @@ public abstract class ThreadTeleLibV2 extends OpMode {
     }
 
     public void wrist(){
-        if(gamepad2.dpad_down && wristLeft.getPosition() != 0){
-            wristLeft.setPosition(0);
+        if(gamepad2.dpad_left){
+            wrist.setPosition(0);
         }
-        else if (gamepad2.dpad_down){
-            wristLeft.setPosition(1);
+        else if (gamepad2.dpad_right){
+            wrist.setPosition(1);
         }
     }
 
@@ -379,11 +498,11 @@ public abstract class ThreadTeleLibV2 extends OpMode {
         double error = targetPosition - currentPos;
 
         // Update telemetry
-        telemetry.addData("Error", error);
-        telemetry.addData("Target Position", targetPosition);
-        telemetry.addData("Current Position", currentPos);
-        telemetry.addData("Filtered Position", pidController.lowPass);
-        telemetry.update();
+//        telemetry.addData("Error", error);
+//        telemetry.addData("Target Position", targetPosition);
+//        telemetry.addData("Current Position", currentPos);
+//        telemetry.addData("Filtered Position", pidController.lowPass);
+
 
         // Calculate power to hold position using CustomPID controller
         double power = pidControllerHold.calculatePower(targetPosition, currentPos);

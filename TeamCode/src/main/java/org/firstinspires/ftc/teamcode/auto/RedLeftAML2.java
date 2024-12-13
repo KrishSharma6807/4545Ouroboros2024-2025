@@ -68,7 +68,7 @@ public class RedLeftAML2 extends LinearOpMode {
 //                .splineToLinearHeading(new Pose2d(54,51, Math.toRadians(-135)), Math.toRadians(100))
         TrajectoryActionBuilder toBucket3 = spike2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(xPosBucket,yPosBucket, Math.toRadians(-135)), Math.toRadians(100))
+                .splineToLinearHeading(new Pose2d(xPosBucket,yPosBucket, Math.toRadians(bucketHeading)), Math.toRadians(100))
                 .waitSeconds(1);
         TrajectoryActionBuilder spike3 = toBucket2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-90))
@@ -78,7 +78,7 @@ public class RedLeftAML2 extends LinearOpMode {
 //                .splineToLinearHeading(new Pose2d(54,51, Math.toRadians(-135)), Math.toRadians(100))
         TrajectoryActionBuilder toBucket4 = spike3.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(xPosBucket, yPosBucket, Math.toRadians(-135)), Math.toRadians(100))
+                .splineToLinearHeading(new Pose2d(xPosBucket, yPosBucket, Math.toRadians(bucketHeading)), Math.toRadians(100))
                 .waitSeconds(1);
         TrajectoryActionBuilder park = toBucket2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-90))
