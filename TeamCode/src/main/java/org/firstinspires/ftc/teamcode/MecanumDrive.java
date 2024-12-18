@@ -66,24 +66,24 @@ public final class MecanumDrive {
         // TODO: fill in these values based on
         //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
+                RevHubOrientationOnRobot.LogoFacingDirection.DOWN;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.UP;
+                RevHubOrientationOnRobot.UsbFacingDirection.RIGHT;
 
 
         // drive model parameters
-        public double inPerTick = 0.00194556734905639983570764607968;
-        public double lateralInPerTick = 0.0014788328850501443;
-        public double trackWidthTicks = 4923.607527742478;
+        public double inPerTick = 0.001973276202;
+        public double lateralInPerTick = 0.0013337690226418006;
+        public double trackWidthTicks = 7018.173254938996;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.2474408275801636;
-        public double kV = 0.00040711477658421025;
-        public double kA = 0.00005;
+        public double kS = 1.963740764333894;
+        public double kV = 0.00023706103261891;
+        public double kA = 0.00006;
 
         // path profile parameters (in inches)
-        public double maxWheelVel = 60;
-        public double minProfileAccel = -50;
+        public double maxWheelVel = 50;
+        public double minProfileAccel = -30;
         public double maxProfileAccel = 50;
 
         // turn profile parameters (in radians)
@@ -91,14 +91,15 @@ public final class MecanumDrive {
         public double maxAngAccel = Math.PI;
 
         // path controller gains
-        public double axialGain = 6.5;
-        public double lateralGain = 6;
-        public double headingGain = 6; // shared with turn
+        public double axialGain = 5;
+        public double lateralGain = 3;
+        public double headingGain = 4; // shared with turn
 
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;
         public double headingVelGain = 0.0; // shared with turn
     }
+
     public static Params PARAMS = new Params();
 
     public final MecanumKinematics kinematics = new MecanumKinematics(
@@ -146,8 +147,10 @@ public final class MecanumDrive {
 
             imu = lazyImu.get();
 
+
             // TODO: reverse encoders if needed
             //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+            //leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
         }
 
         @Override
@@ -238,6 +241,7 @@ public final class MecanumDrive {
         // TODO: reverse motor directions if needed
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
+        //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
