@@ -39,11 +39,11 @@ public class practiceAuto extends LinearOpMode {
         waitForStart();
         timer.reset();
         while (opModeIsActive()) {
-            while (timer.seconds() < .5) {
-                bl.setPower(1);
-                br.setPower(1);
-                fr.setPower(1);
-                fl.setPower(1);
+            while (timer.seconds() < 5) {
+                bl.setPower(-.5);
+                br.setPower(-.5);
+                fr.setPower(-.5);
+                fl.setPower(-.5);
             }
             bl.setPower(0);
             br.setPower(0);

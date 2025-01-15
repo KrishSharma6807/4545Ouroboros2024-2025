@@ -37,8 +37,8 @@ public class ThreadTeleOpV2 extends ThreadTeleLibV2 {
         intake();
         horizSlides();
         intakeTilt();
-        claw();
-        //wrist();
+        wrist();
+
 
 
         boolean isBumperPressed = gamepad2.right_bumper && gamepad2.left_bumper;
@@ -59,10 +59,12 @@ public class ThreadTeleOpV2 extends ThreadTeleLibV2 {
             case SAMPLE:
                 verticalSlidesSample();
                 armSample();
+                clawSample();
                 break;
             case SPECIMEN:
                 verticalSlidesSpecimen();
                 armSpecimen();
+                clawSpecimen();
                 break;
         }
 
