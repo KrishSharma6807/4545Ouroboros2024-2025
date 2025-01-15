@@ -34,7 +34,7 @@ public class CustomPID {
         double internalTimer = getTimeRan();
 
         lowPass = a * currentPos + (1 - a) * lowPass;
-        double error = desiredPos - lowPass;
+        double error = desiredPos - currentPos;
         integralSum =  error * timer.currentTime();
         derivative = (error - previousError) / internalTimer;
 
