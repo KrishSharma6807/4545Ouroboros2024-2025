@@ -71,9 +71,11 @@ ThreeSpecimenTwoHumanPlayer extends LinearOpMode {
         TrajectoryActionBuilder toBar = drive.actionBuilder(initialPose)
                 .splineToLinearHeading(new Pose2d(xPosBar,yPosBar, Math.toRadians(90)), Math.toRadians(SplineHeading))
                 .lineToY(yFinal, new TranslationalVelConstraint(baseTransVel), baseAccelConstraint);
+
         TrajectoryActionBuilder backSpike1 = toBar.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-90))
                 .lineToY(yFinal-8);
+
         TrajectoryActionBuilder toSpike1 = backSpike1.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-90))
                 .splineToLinearHeading(new Pose2d(38, -37, Math.toRadians(rightHeading)), Math.toRadians(45))
@@ -96,8 +98,11 @@ ThreeSpecimenTwoHumanPlayer extends LinearOpMode {
                 .splineToLinearHeading(new Pose2d(xPosBar + 3,yPosBar, Math.toRadians(90)), Math.toRadians(SplineHeading))
                 .lineToY(yFinal, new TranslationalVelConstraint(baseTransVel), baseAccelConstraint);
 
-        TrajectoryActionBuilder toObserve2 = toBar2.endTrajectory().fresh()
-                .setTangent(Math.toRadians(-90))
+        TrajectoryActionBuilder back2 =  toBar2.endTrajectory().fresh()
+                .lineToY(yFinal - 8);
+
+        TrajectoryActionBuilder toObserve2 = back2.endTrajectory().fresh()
+                .setTangent(Math.toRadians(-45))
                 .splineToLinearHeading(new Pose2d(xPosObserve,yPosOverserve + 6, Math.toRadians(rightHeading)),Math.toRadians(-90))
                 .lineToY(yPosOverserve);
 
@@ -116,16 +121,25 @@ ThreeSpecimenTwoHumanPlayer extends LinearOpMode {
                 .splineToLinearHeading(new Pose2d(xPosBar - 5 ,yPosBar, Math.toRadians(90)), Math.toRadians(SplineHeading))
                 .lineToY(yFinal, new TranslationalVelConstraint(baseTransVel), baseAccelConstraint);
 
-        TrajectoryActionBuilder toObserve3 = toBar3.endTrajectory().fresh()
-                .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(xPosObserve,yPosOverserve + 5, Math.toRadians(rightHeading)),Math.toRadians(-90))
+        TrajectoryActionBuilder back3 =  toBar3.endTrajectory().fresh()
+                .lineToY(yFinal - 8);
+
+        TrajectoryActionBuilder toObserve3 = back3.endTrajectory().fresh()
+                .setTangent(Math.toRadians(-45))
+                .splineToLinearHeading(new Pose2d(xPosObserve,yPosOverserve + 5, Math.toRadians(rightHeading)),Math.toRadians(-45))
                 .lineToY(yPosOverserve-10);
 
+        //waits
+        TrajectoryActionBuilder waitShort = toBar3.endTrajectory().fresh()
+                .waitSeconds(.25);
         TrajectoryActionBuilder wait = toBar3.endTrajectory().fresh()
-                        .waitSeconds(.85);
+                        .waitSeconds(.75);
+        TrajectoryActionBuilder waitLong = toBar3.endTrajectory().fresh()
+                .waitSeconds(1.5);
 
         waitForStart();
         if (isStopRequested()) return;
+
 //Cycle 1
         Actions.runBlocking(
                 new ParallelAction(
@@ -139,105 +153,105 @@ ThreeSpecimenTwoHumanPlayer extends LinearOpMode {
         Actions.runBlocking(
                 new SequentialAction(
                         arm.upSpecimenArmFull(),
-                        wait.build(),
-                        backSpike1.build(),
-                        claw.openClawWaitShort(),
-                        wait.build()
-                )
-        );
-
-
-//        Cycle 2
-
-        Actions.runBlocking(
-                new ParallelAction(
-                        hSlides.returnIntakeSlides(),
-                        wait.build()
-                )
-        );
-        Actions.runBlocking(
-                new SequentialAction(
-                        toSpike1.build(),
-                        claw.closeClaw(),
-                        arm.downSpecimenArm(),
-                        slides.PIDGrab(),
-                        wait.build(),
-                        wait.build(),
-                        wait.build(),
-                        claw.openClaw(),
-                        backObserve.build(),
-                        hSlides.returnIntakeSlides(),
-                        arm.downSpecimenArm(),
-                        wait.build(),
-                        claw.closeClaw(),
-                        wait.build(),
-                        wait.build(),
-                        slides.liftUpPartialPID(),
-                        wait.build(),
-                        arm.upSpecimenArm(),
-                        slides.PIDDownFull()
-                        //forwardObserve.build()
-
-                )
-        );//
-        Actions.runBlocking(
-                new ParallelAction(
-                        hSlides.returnIntakeSlides(),
-                        slides.PIDDownFull(),
-                        toBar2.build()
-                )
-        );
-        Actions.runBlocking(
-                new SequentialAction(
-                        arm.upSpecimenArmFull(),
-                        hSlides.returnIntakeSlides(),
-                        claw.closeClaw(),
-                        arm.downSpecimenArm(),
-                        slides.PIDGrab(),
-                        claw.closeClaw()
-
-                        //Cycle 3
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction(
-                        //Cycle 3
+                        waitShort.build(),
                         claw.openClawWait(),
-                        toObserve2.build(),
+                        backSpike1.build()
+
+                )
+        );
+
+
+//Cycle 2
+        Actions.runBlocking(
+                new ParallelAction(
                         hSlides.returnIntakeSlides(),
-                        claw.openClaw(),
-                       slides.PIDGrab()
+                        toSpike1.build(),
+                        slides.PIDGrab(),
+                        claw.closeClaw(),
+                        arm.downSpecimenArm()
+
                 )
         );
         Actions.runBlocking(
                 new SequentialAction(
-                        hSlides.returnIntakeSlides(),
-                        backObserve2.build(),
+                        toObserve1.build(),
+                        claw.openClawWaitShort(),
+                        backObserve.build(),
                         claw.closeClaw(),
                         wait.build(),
-                        slides.liftUpPartialPID()
+                        slides.liftUpPartial()
                 )
         );
         Actions.runBlocking(
                 new ParallelAction(
                         hSlides.returnIntakeSlides(),
-                        claw.closeClaw(),
                         arm.upSpecimenArm(),
-                        slides.PIDDownFull(),
-                        toBar3.build()
+                        slides.liftDownFullWait()
                 )
         );
         Actions.runBlocking(
                 new SequentialAction(
-                        slides.liftUp(),
-//                        claw.openClaw(),
-//                        claw.closeClaw(),
-                        slides.PIDDownFull(),
-                        //Park
+                        toBar2.build(),
+                        waitShort.build(),
+                        arm.upSpecimenArmFull(),
+                        waitLong.build(),
+                        claw.openClawWait(),
+                        back2.build(),
+                        slides.liftDownFull()
+                )
+        );
+
+//Cycle 3
+        Actions.runBlocking(
+                new ParallelAction(
                         hSlides.returnIntakeSlides(),
-                        toObserve3.build(),
+                        claw.closeClaw(),
+                        slides.PIDGrab(),
                         arm.downSpecimenArm()
                 )
         );
+
+        Actions.runBlocking(
+                new SequentialAction(
+                        toObserve2.build(),
+                        claw.openClawWaitShort(),
+                        backObserve2.build(),
+                        claw.closeClaw(),
+                        waitLong.build(),
+                        slides.liftUpPartial()
+                )
+        );
+        Actions.runBlocking(
+                new ParallelAction(
+                        hSlides.returnIntakeSlides(),
+                        arm.upSpecimenArm(),
+                        slides.liftDownFullWait()
+                )
+        );
+        Actions.runBlocking(
+                new SequentialAction(
+                        toBar3.build(),
+                        waitShort.build(),
+                        arm.upSpecimenArmFull(),
+                        waitLong.build(),
+                        claw.openClawWait(),
+                        back3.build(),
+                        wait.build(),
+                        waitShort.build(),
+                        toObserve3.build()
+                )
+        );
+
+        //Park
+        Actions.runBlocking(
+            new ParallelAction(
+
+                    claw.closeClaw(),
+                    arm.downSpecimenArm(),
+                    hSlides.returnIntakeSlides(),
+                    slides.liftDownFull()
+            )
+        );
+
     }
 }

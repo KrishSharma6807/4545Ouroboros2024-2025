@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.robotControl.CustomPID;
 
@@ -24,6 +25,8 @@ public class OuttakeSlides {
     public static double kD = .0;
     public static double kF = 0.15;
     CustomPID pidController = new CustomPID(kP, kI, kD, kF);
+
+    ElapsedTime timer = new ElapsedTime();
 
 
 
@@ -126,8 +129,8 @@ public class OuttakeSlides {
             outtakeSlidesLeft.setPower(-power);
             outtakeSlidesRight.setPower(-power);
             if (!(position < (target - 20) || position > (target + 20))){
-                outtakeSlidesLeft.setPower(-0.005);
-                outtakeSlidesRight.setPower(-0.005);
+                outtakeSlidesLeft.setPower(-0.01);
+                outtakeSlidesRight.setPower(-0.01);
             }
             return Math.abs(target - position) > 35;
         }
@@ -158,8 +161,8 @@ public class OuttakeSlides {
             outtakeSlidesLeft.setPower(-power);
             outtakeSlidesRight.setPower(-power);
             if (!(position < (target - 20) || position > (target + 20))){
-                outtakeSlidesLeft.setPower(-0.005);
-                outtakeSlidesRight.setPower(-0.005);
+                outtakeSlidesLeft.setPower(-0.01);
+                outtakeSlidesRight.setPower(-0.01);
             }
             return Math.abs(target - position) > 25;
         }
@@ -260,7 +263,6 @@ public class OuttakeSlides {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-
                 double power = pidController.calculatePower(0, -outtakeSlidesRight.getCurrentPosition());
                 outtakeSlidesLeft.setPower(-power);
                 outtakeSlidesRight.setPower(-power);
@@ -282,6 +284,39 @@ public class OuttakeSlides {
     }
     public Action liftDownFull() {
         return new LiftDownFull();
+    }
+
+    public class LiftDownFullWait implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                timer.reset();
+                while(timer.seconds() < .3){
+
+                }
+                double power = pidController.calculatePower(0, -outtakeSlidesRight.getCurrentPosition());
+                outtakeSlidesLeft.setPower(-power);
+                outtakeSlidesRight.setPower(-power);
+
+
+                initialized = true;
+            }
+
+            double pos = -outtakeSlidesRight.getCurrentPosition();
+            packet.put("liftPos", pos);
+            if (pos > 10) {
+                return true;
+            } else {
+                outtakeSlidesLeft.setPower(0);
+                outtakeSlidesRight.setPower(0);
+                return false;
+            }
+        }
+    }
+    public Action liftDownFullWait() {
+        return new LiftDownFullWait();
     }
 
     public class returnIntakeSlides implements Action {
