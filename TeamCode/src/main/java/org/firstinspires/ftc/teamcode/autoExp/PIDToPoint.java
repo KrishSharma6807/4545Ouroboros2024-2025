@@ -83,7 +83,7 @@ public class PIDToPoint extends OpMode {
         fr.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        localizer = hardwareMap.get(GoBildaPinpointDriverRR.class, PARAMS.pinpointDeviceName);
+        localizer = hardwareMap.get(GoBildaPinpointDriverRR.class, "pinpoint");
         dashboard = FtcDashboard.getInstance();
 
         TelemetryPacket packet = new TelemetryPacket();
@@ -94,7 +94,6 @@ public class PIDToPoint extends OpMode {
         dashboard.sendTelemetryPacket(packet);
     }
     public void loop() {
-        // Update the PurePursuitCommand
         // Get the current position of the robot
         TelemetryPacket packet = new TelemetryPacket();
         Canvas fieldOverlay = packet.fieldOverlay();
@@ -109,7 +108,8 @@ public class PIDToPoint extends OpMode {
         fieldOverlay.strokeLine(targetPose.x, targetPose.y, targetPose.x + Math.cos(targetPose.heading) * 9, targetPose.y + Math.sin(targetPose.heading) * 9);
 
         fieldOverlay.strokeCircle(targetPose.x, targetPose.y,2);
-        telemetry.update();
+
+        packet.put("x", robotPose2.x);
         dashboard.sendTelemetryPacket(packet);
 
         execute();

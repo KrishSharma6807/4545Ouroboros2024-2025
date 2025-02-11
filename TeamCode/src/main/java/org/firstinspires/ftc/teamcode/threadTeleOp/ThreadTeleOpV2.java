@@ -37,7 +37,8 @@ public class ThreadTeleOpV2 extends ThreadTeleLibV2 {
         intake();
         horizSlides();
         intakeTilt();
-        wrist();
+        //wrist();
+        disableArm();
 
 
 

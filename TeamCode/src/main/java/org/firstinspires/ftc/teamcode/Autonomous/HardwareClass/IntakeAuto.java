@@ -17,6 +17,12 @@ public class IntakeAuto {
     private DcMotorEx intake;
     public Servo intakeTiltLeft;
     public Servo intakeTiltRight;
+
+    public static double intakeTiltLeftUp = .4;
+    public static double intakeTiltRightUp = .02;
+
+    public static double intakeTiltLeftDown = .2;
+    public static double intakeTiltRightDown = .35;
     public IntakeAuto(HardwareMap hardwareMap) {
         intake = hardwareMap.get(DcMotorEx.class, "intake");
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -76,8 +82,8 @@ public class IntakeAuto {
     public class IntakeTiltUp implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            intakeTiltLeft.setPosition(.8);
-            intakeTiltRight.setPosition(0.47);
+            intakeTiltLeft.setPosition(intakeTiltLeftUp);
+            intakeTiltRight.setPosition(intakeTiltRightUp);
             return false;
         }
     }
@@ -88,8 +94,8 @@ public class IntakeAuto {
     public class IntakeTiltDown implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            intakeTiltLeft.setPosition(.6);
-            intakeTiltRight.setPosition(0.85);
+            intakeTiltLeft.setPosition(intakeTiltLeftDown);
+            intakeTiltRight.setPosition(intakeTiltRightDown);
             return false;
         }
     }

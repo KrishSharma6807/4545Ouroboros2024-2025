@@ -12,15 +12,29 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.State;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.ThreadHandler;
 import org.firstinspires.ftc.teamcode.robotControl.CustomPID;
+
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import android.graphics.Color;
 
 import java.util.List;
 
 @Config
 public abstract class ThreadTeleLibV2 extends OpMode {
     FtcDashboard dashboard;
+
+    private NormalizedColorSensor colorSensor;
+    private String detectedColor = "unknown";
+    private float[] hsv = new float[3];
+    private boolean autoRetractEnabled = true;
+    private ElapsedTime colorCheckTimer = new ElapsedTime();
+
+    private boolean intakeActive = false;
+
 
     public DcMotorEx br;
     public DcMotorEx bl;
@@ -48,11 +62,17 @@ public abstract class ThreadTeleLibV2 extends OpMode {
     public static double kD = .001;
     CustomPID pidController = new CustomPID(kP, kI, kD, 0.0);
 
-    public static double kPe = 0.023 ;
+    public static double kPe = .0009 ;
     public static double kIe = 0;
     public static double kDe= 0;
     public static double kFe = 0;
     CustomPID pidControllerHorizontal = new CustomPID(kPe, kIe, kDe, kFe);
+
+    public static double kPeH = .0009 ;
+    public static double kIeH = 0;
+    public static double kDeH= 0;
+    public static double kFeH = 0;
+    CustomPID pidControllerHorizontalHold = new CustomPID(kPeH, kIeH, kDeH, kFeH);
 
     public static  double kPh = 0;
     public static  double kIh = 0;
@@ -70,6 +90,7 @@ public abstract class ThreadTeleLibV2 extends OpMode {
     private double previousError = 0;
     private ElapsedTime timer = new ElapsedTime();
     private ElapsedTime timeOut = new ElapsedTime();
+    private ElapsedTime timeOutH = new ElapsedTime();
 
     boolean isArmDown = true;
     boolean armTogglePressed = false;
@@ -92,22 +113,31 @@ public abstract class ThreadTeleLibV2 extends OpMode {
     public static double armLeft2Sample = .91;//1 is max, .25 is min
 
     public static double armRight1Specimen = 1;
-    public static double armRight2Specimen = .4;//.2 is max, 1 is min (tune min more)
+    public static double armRight2Specimen = .65;//.2 is max, 1 is min (tune min more)
+    public static double armRight3Specimen = .55;
 
     public static double armLeft1Specimen = .25;
-    public static double armLeft2Specimen = .75;
+    public static double armLeft2Specimen = .7;
+    public static double armLeft3Specimen = .8;
 
     public static double armRight1Sample = .8;
     public static double armRight2Sample = .29;
 
     public static double closeClawSpecimen = .5;
-    public static double openClawSpecimen = .67;
+    public static double openClawSpecimen = 1;
+
+    public static double intakeTiltLeftUp = .4;
+    public static double intakeTiltRightUp = .02;
+
+    public static double intakeTiltLeftDown = .2;
+    public static double intakeTiltRightDown = .37;
 
     public static double closeClawSample = .5;
-    public static double openClawSample = .67;
+    public static double openClawSample = 1;
 
     public static double wrist1Specimen = .31;
-    public static double wrist2Specimen = .85;
+    public static double wrist2Specimen = .63;
+    public static double wrist3Specimen = .63;
 
     public static double wrist1Sample = 1;
     public static double wrist2Sample = .5;
@@ -124,8 +154,32 @@ public abstract class ThreadTeleLibV2 extends OpMode {
         LIFT_SPECIMEN_HIGH,
         LIFT_SPECIMEN_LOW
     };
+    private enum OuttakeState {
+        IDLE,
+        MOVING_UP_INITIAL,
+        CHECKING_SAMPLE,
+        CHECKING_SAMPLE_WHILE_RAISING,
+        RETRYING_LOWER,
+        RETRYING_GRAB,
+        MOVING_UP_RETRY,
+        FINAL_CHECK,
+        COMPLETE
+    }
+
+    private OuttakeState currentOuttakeState = OuttakeState.IDLE;
+    private ElapsedTime stateTimer = new ElapsedTime();
+    public enum ArmStateSpecimen {
+        POSITION_1,
+        POSITION_2,
+        POSITION_3
+    }
+    private ArmStateSpecimen currentArmState = ArmStateSpecimen.POSITION_1;
     public void init() {
         dash = FtcDashboard.getInstance();
+
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
+        colorSensor.setGain(4);
+
         br = hardwareMap.get(DcMotorEx.class, "br");
         fr = hardwareMap.get(DcMotorEx.class, "fr");
         fl = hardwareMap.get(DcMotorEx.class, "fl");
@@ -160,6 +214,8 @@ public abstract class ThreadTeleLibV2 extends OpMode {
         fl.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         intakeSlides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        intakeSlides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        intakeSlides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         outtakeSlidesLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         outtakeSlidesLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -171,7 +227,6 @@ public abstract class ThreadTeleLibV2 extends OpMode {
 
         outtakeSlidesLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         outtakeSlidesRight.setDirection(DcMotorSimple.Direction.REVERSE);
-
 
         lowPass = outtakeSlidesRightPosition;
 
@@ -219,7 +274,7 @@ public abstract class ThreadTeleLibV2 extends OpMode {
             armRight.setPosition(armRight1Specimen);
             wrist.setPosition(wrist1Specimen);
 
-            targetPosition = 330;
+            targetPosition = 380;
             RunTOPos();
             clawSpin.setPosition(clawSpin1);
 
@@ -228,44 +283,82 @@ public abstract class ThreadTeleLibV2 extends OpMode {
 
     });
 
-    Thread outtake_down = new Thread(new Runnable() {
-
-        @Override
-        public void run() {
-
-            ElapsedTime time = new ElapsedTime();
-            time.reset();
-            while(time.milliseconds() < 300) {
-
-            }
-
-            armLeft.setPosition(armLeft1Sample);
-            armRight.setPosition(armRight1Sample);
-            wrist.setPosition(wrist1Sample);
-            targetPosition = 50;
-            RunTOPos();
-        }
-
-    });
+//    Thread outtake_down = new Thread(new Runnable() {
+//
+//        @Override
+//        public void run() {
+//
+//            ElapsedTime time = new ElapsedTime();
+//            time.reset();
+//            while(time.milliseconds() < 300) {
+//
+//            }
+//
+//            armLeft.setPosition(armLeft1Sample);
+//            armRight.setPosition(armRight1Sample);
+//            wrist.setPosition(wrist1Sample);
+//            claw.setPosition(openClawSample);
+//            intakeTiltLeft.setPosition(intakeTiltLeftDown);
+//            intakeTiltRight.setPosition(intakeTiltRightDown);
+//            targetPosition = 285;
+//            RunTOPos();
+//        }
+//
+//    });
 
     Thread outtake_up_high_bucket = new Thread(new Runnable() {
-
-        @Override//
+        @Override
         public void run() {
-
             ElapsedTime time = new ElapsedTime();
             time.reset();
-            while(time.milliseconds() < 300) {
+            // Initial delay for arm movement
+            while (time.milliseconds() < 300) {}
 
-            }
-
+            // Move arm, wrist, and slides to high position
             armLeft.setPosition(armLeft2Sample);
             armRight.setPosition(armRight2Sample);
             wrist.setPosition(wrist2Sample);
             targetPosition = 1500;
-            RunTOPos();
-        }
+            RunTOPos(); // Blocking call to reach target position
+            clawSpin.setPosition(clawSpin2);
 
+            // Allow time for sensor stabilization
+            ElapsedTime detectionDelay = new ElapsedTime();
+            detectionDelay.reset();
+            while (detectionDelay.milliseconds() < 200) {}
+
+            // Check if sample is present
+            boolean sampleDetected = isSampleDetected();
+            if (!sampleDetected) {
+                // First retry: lower slides, open claw, close, then move up again
+                targetPosition = 285;
+                RunTOPos();
+
+                claw.setPosition(openClawSample); // Open claw
+
+                // Wait for claw to open
+                ElapsedTime wait = new ElapsedTime();
+                wait.reset();
+                while (wait.milliseconds() < 500) {}
+
+                claw.setPosition(closeClawSample); // Close claw
+
+                targetPosition = 1500;
+                RunTOPos(); // Move slides up again
+
+                // Check again after retry
+                detectionDelay.reset();
+                while (detectionDelay.milliseconds() < 200) {}
+                sampleDetected = isSampleDetected();
+
+                if (!sampleDetected) {
+                    // Second failure: lower slides and open claw
+                    targetPosition = 285;
+                    RunTOPos();
+                    claw.setPosition(openClawSample);
+                }
+            }
+        }
     });
 
     Thread hold = new Thread(new Runnable() {
@@ -284,26 +377,59 @@ public abstract class ThreadTeleLibV2 extends OpMode {
 
     });
 
+    Thread holdHorizontal = new Thread(new Runnable() {
 
-    public void update(){
+        @Override
+        public void run() {
+            ElapsedTime time = new ElapsedTime();
+            time.reset();
+            horizPID();
+        }
+
+    });
+
+    Thread horizontal = new Thread(new Runnable() {
+
+        @Override
+        public void run() {
+            ElapsedTime time = new ElapsedTime();
+            time.reset();
+            runToHorizPID();
+        }
+
+    });
+
+
+    public void update() {
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
 
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
+        // Only check color when intake is active and 100ms has elapsed
+        if(intakeActive && colorCheckTimer.milliseconds() >= 100) {
+            NormalizedRGBA colors = colorSensor.getNormalizedColors();
+            Color.colorToHSV(colors.toColor(), hsv);
+            detectedColor = classifyColor(hsv[0], hsv[1], hsv[2]);
+            colorCheckTimer.reset();
+        }
+
+        // Existing update logic
         outtakeSlidesLeftPosition = outtakeSlidesLeft.getCurrentPosition();
         outtakeSlidesRightPosition = -outtakeSlidesRight.getCurrentPosition();
         intakeSlidesPosition = intakeSlides.getCurrentPosition();
 
-        telemetryPacket.put("error", targetPosition - outtakeSlidesRightPosition);
-        telemetryPacket.put("power", outtakeSlidesRight.getPower());
-
+        telemetryPacket.put("Detected Color", detectedColor);
+        telemetryPacket.put("Intake Active", intakeActive);
         dash.sendTelemetryPacket(telemetryPacket);
-
     }
 
     public void telem(){
+        telemetry.addData("Intake Active", intakeActive);
+        telemetry.addData("Last Color", detectedColor);
+        telemetry.addData("Color Check Interval", colorCheckTimer.milliseconds());
+
         telemetry.addData("fr:", fr.getPower());
         telemetry.addData("br:", br.getPower());
         telemetry.addData("fl:", fl.getPower());
@@ -326,6 +452,8 @@ public abstract class ThreadTeleLibV2 extends OpMode {
         telemetry.addData("intakeSlides", intakeSlides.getPower());
         telemetry.addData("intakeSlidesPos", intakeSlides.getCurrentPosition());
 
+        telemetry.addData("Target Position", targetPositionHorizontal);
+
         telemetry.addData("intake", intake.getPower());
         telemetry.addData("intakeCurrent", intake.getCurrent(CurrentUnit.MILLIAMPS));
 
@@ -343,6 +471,16 @@ public abstract class ThreadTeleLibV2 extends OpMode {
 
         telemetry.update();
     }
+    public void disableArm(){
+        if(gamepad1.x){
+            armLeft.getController().pwmDisable();
+            armRight.getController().pwmDisable();
+        }
+        if(gamepad1.y){
+            armLeft.getController().pwmEnable();
+            armRight.getController().pwmEnable();
+        }
+    }
     public void ArcadeDrive() {
 
         double left_stick_x = gamepad1.left_stick_x;
@@ -355,10 +493,10 @@ public abstract class ThreadTeleLibV2 extends OpMode {
 
         if (Math.abs(left_stick_x) > 0.1 ||
                 Math.abs(left_stick_y) >.1|| Math.abs(right_stick_x) > 0.1){
-            fr.setPower(voltage/13.5 * ((left_stick_y + left_stick_x) + right_stick_x) / denominator);
-            fl.setPower(voltage/13.5 * ((left_stick_y - left_stick_x) - right_stick_x) / denominator);
-            br.setPower(voltage/13.5 * ((left_stick_y - left_stick_x) + right_stick_x) / denominator);
-            bl.setPower(voltage/13.5 * ((left_stick_y + left_stick_x) - right_stick_x) / denominator);
+            fr.setPower(/*voltage/13.5 **/ ((left_stick_y + left_stick_x) + right_stick_x) );
+            fl.setPower(((left_stick_y - left_stick_x) - right_stick_x) );
+            br.setPower(((left_stick_y - left_stick_x) + right_stick_x) );
+            bl.setPower(((left_stick_y + left_stick_x) - right_stick_x) );
         }
         else{
             fl.setPower(0);
@@ -369,18 +507,36 @@ public abstract class ThreadTeleLibV2 extends OpMode {
     }
 
     public void horizSlides() {
-
-         if (gamepad2.left_trigger > .2) {
+        // Existing manual controls
+        if (gamepad2.left_trigger > .2) {
             intakeSlides.setPower(-gamepad2.left_trigger);
+            targetPositionHorizontal = intakeSlidesPosition;
         } else if (gamepad2.right_trigger > .2) {
             intakeSlides.setPower(gamepad2.right_trigger);
+            targetPositionHorizontal = intakeSlidesPosition;
+        }
+        else if (gamepad2.dpad_right){
+            targetPositionHorizontal = -1000;
+            th_intake.queue(horizontal);
+        }
+        else if (gamepad2.dpad_left){
+            targetPositionHorizontal = 0;
+            th_intake.queue(horizontal);
         }
         else {
-            intakeSlides.setPower(0);
-//            targetPositionHorizontal = intakeSlides.getCurrentPosition();
-//            horizPID();
+            th_intake.queue(holdHorizontal);
         }
 
+        // Auto-retract only when intake is active
+        if(intakeActive) {
+            if(detectedColor.equals("red") && intakeSlidesPosition < -100) {
+                intakeTiltLeft.setPosition(intakeTiltLeftDown);
+                intakeTiltRight.setPosition(intakeTiltRightDown);
+                targetPositionHorizontal = 0;
+                th_intake.queue(horizontal);
+                detectedColor = "unknown"; // Reset to prevent repeated triggers
+            }
+        }
     }
 
     public void intakeTilt() {
@@ -389,11 +545,11 @@ public abstract class ThreadTeleLibV2 extends OpMode {
             intakeTiltTogglePressed = true;
 
             if (isIntakeTiltUp) {
-                intakeTiltLeft.setPosition(1);
-                intakeTiltRight.setPosition(1);
+                intakeTiltLeft.setPosition(intakeTiltLeftUp);
+                intakeTiltRight.setPosition(intakeTiltRightUp);
             } else {
-                intakeTiltLeft.setPosition(.6);
-                intakeTiltRight.setPosition(0.6);
+                intakeTiltLeft.setPosition(intakeTiltLeftDown);
+                intakeTiltRight.setPosition(intakeTiltRightDown);
             }
 
             isIntakeTiltUp = !isIntakeTiltUp;
@@ -419,6 +575,28 @@ public abstract class ThreadTeleLibV2 extends OpMode {
                 th_outtake.queue(outtake_up_high_bucket);
             }
             else if (gamepad2.dpad_down) {
+                Thread outtake_down = new Thread(new Runnable() {
+
+                    @Override
+                    public void run() {
+
+                        ElapsedTime time = new ElapsedTime();
+                        time.reset();
+                        while(time.milliseconds() < 300) {
+
+                        }
+
+                        armLeft.setPosition(armLeft1Sample);
+                        armRight.setPosition(armRight1Sample);
+                        wrist.setPosition(wrist1Sample);
+                        claw.setPosition(openClawSample);
+                        intakeTiltLeft.setPosition(intakeTiltLeftDown);
+                        intakeTiltRight.setPosition(intakeTiltRightDown);
+                        targetPosition = 285;
+                        RunTOPos();
+                    }
+
+                });
                 th_outtake.queue(outtake_down);
                 targetPositionSet = false;
             }
@@ -443,8 +621,8 @@ public abstract class ThreadTeleLibV2 extends OpMode {
             outtakeSlidesRight.setPower(gamepad2.left_stick_y);
             targetPositionSet = false;
         } else if (gamepad2.dpad_up) {
-            th_outtake.queue(outtake_up_high_specimen);
-        } else if (gamepad2.dpad_down) {
+                currentOuttakeState = OuttakeState.MOVING_UP_INITIAL;
+            } else if (gamepad2.dpad_down) {
             th_outtake.queue(outtake_down_high_specimen);
             targetPositionSet = false;
         } else {
@@ -477,9 +655,9 @@ public abstract class ThreadTeleLibV2 extends OpMode {
             clawTogglePressed = true;
 
             if (isClawOpen) {
-                claw.setPosition(openClawSpecimen);
+                claw.setPosition(openClawSample);
             } else {
-                claw.setPosition(closeClawSpecimen);
+                claw.setPosition(closeClawSample);
             }
 
             isClawOpen = !isClawOpen;
@@ -488,27 +666,35 @@ public abstract class ThreadTeleLibV2 extends OpMode {
         }
     }
 
-
-
     public void armSpecimen(){
         if (gamepad2.a && !armTogglePressed) {
             armTogglePressed = true;
-
-            if (isArmDown) {
-                armLeft.setPosition(armLeft1Specimen);
-                armRight.setPosition(armRight1Specimen);
-                wrist.setPosition(wrist1Specimen);
-            } else {
-                armLeft.setPosition(armLeft2Specimen);
-                armRight.setPosition(armRight2Specimen);
-                wrist.setPosition(wrist2Specimen);
+            switch (currentArmState) {
+                case POSITION_1:
+                    armLeft.setPosition(armLeft1Specimen);
+                    armRight.setPosition(armRight1Specimen);
+                    wrist.setPosition(wrist1Specimen);
+                    claw.setPosition(closeClawSpecimen);
+                    currentArmState = ArmStateSpecimen.POSITION_2;
+                    break;
+                case POSITION_2:
+                    armLeft.setPosition(armLeft2Specimen);
+                    armRight.setPosition(armRight2Specimen);
+                    wrist.setPosition(wrist2Specimen);
+                    claw.setPosition(closeClawSpecimen);
+                    currentArmState = ArmStateSpecimen.POSITION_3;
+                    break;
+                case POSITION_3:
+                    armLeft.setPosition(armLeft3Specimen);
+                    armRight.setPosition(armRight3Specimen);
+                    wrist.setPosition(wrist3Specimen);
+                    claw.setPosition(closeClawSpecimen);
+                    currentArmState = ArmStateSpecimen.POSITION_1;
+                    break;
             }
-
-            isArmDown = !isArmDown;
         } else if (!gamepad2.a) {
             armTogglePressed = false;
         }
-
     }
 
     public void armSample(){
@@ -519,11 +705,13 @@ public abstract class ThreadTeleLibV2 extends OpMode {
                 armLeft.setPosition(armLeft1Sample);
                 armRight.setPosition(armRight1Sample);
                 wrist.setPosition(wrist1Sample);
+                claw.setPosition(closeClawSpecimen);
             } else {
                 armLeft.setPosition(armLeft2Sample);
                 armRight.setPosition(armRight2Sample);
 //                wrist.getController().pwmEnable();
                 wrist.setPosition(wrist2Sample);
+                claw.setPosition(closeClawSpecimen);
             }
 
             isArmDown = !isArmDown;
@@ -533,24 +721,25 @@ public abstract class ThreadTeleLibV2 extends OpMode {
 
     }
 
-    public void wrist(){
-        if(gamepad2.dpad_left){
-            wrist.setPosition(0);
-        }
-        else if (gamepad2.dpad_right){
-            wrist.setPosition(1);
-        }
-    }
+//    public void wrist(){
+//        if(gamepad2.dpad_left){
+//            wrist.setPosition(0);
+//        }
+//        else if (gamepad2.dpad_right){
+//            wrist.setPosition(1);
+//        }
+//    }
 
-    public void intake(){
-        if(gamepad2.y){
+    public void intake() {
+        if(gamepad2.y) {
             intake.setPower(-1);
-        }
-        else if (gamepad2.b){
+            intakeActive = false;
+        } else if (gamepad2.b) {
             intake.setPower(1);
-        }
-        else{
+            intakeActive = true;
+        } else {
             intake.setPower(0);
+            intakeActive = false;
         }
     }
 
@@ -586,14 +775,14 @@ public abstract class ThreadTeleLibV2 extends OpMode {
             // Calculate power using CustomPID controller
             double power = pidController.calculatePower(targetPosition, currentPos);
 
-            power = Math.max(-1.0, Math.min(1.0, power));
+            power = Math.max(-1.0, Math.min(1.0, power)) + .1;
 
             // Set motor power
             outtakeSlidesLeft.setPower(-power);
             outtakeSlidesRight.setPower(-power);
 
             // Check if error is within tolerance
-            if (Math.abs(error) <= 5) {
+            if (Math.abs(error) <= 20) {
                 break;  // Exit loop if within tolerance
             }
         }
@@ -602,23 +791,148 @@ public abstract class ThreadTeleLibV2 extends OpMode {
     }
 
     public void horizPID(){
-        pidControllerHorizontal.timer.reset();  // Reset the PID controller's internal timer
+        pidControllerHorizontalHold.timer.reset();
+        // Reset the PID controller's internal timer
 
 
         // Get current position
         double currentPos = intakeSlidesPosition;
-        double error = targetPosition - currentPos;
+        double error = targetPositionHorizontal - currentPos;
 
+        voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
 
         // Calculate power to hold position using CustomPID controller
-        double power = pidController.calculatePower(targetPositionHorizontal, currentPos);
+        double power = pidControllerHorizontalHold.calculatePower(targetPositionHorizontal, currentPos);
 
         power = Math.max(-1.0, Math.min(1.0, power));
 
         // Set motor power to hold position
-        intakeSlides.setPower(power);
+        intakeSlides.setPower(-(voltage/13.5) * power);
     }
 
+    public void runToHorizPID(){
+        timeOutH.reset();
+        while(timeOutH.seconds() < 2) {
+
+            // Get current position
+            double currentPos = intakeSlidesPosition;
+            double error = targetPositionHorizontal - currentPos;
+
+
+            // Calculate power to hold position using CustomPID controller
+            double power = pidControllerHorizontal.calculatePower(targetPositionHorizontal, currentPos);
+
+            power = Math.max(-1.0, Math.min(1.0, power));
+
+
+            // Set motor power to hold position
+            intakeSlides.setPower(-(voltage/13.5)* power);
+
+            if (Math.abs(error) <= 5) {
+                break;  // Exit loop if within tolerance
+            }
+        }
+        targetPositionHorizontal = intakeSlidesPosition;
+    }
+
+    private String classifyColor(float hue, float saturation, float value) {
+        // (Same classification logic as before)
+        if (saturation < 0.3) return "unknown";
+        if ((hue >= 0 && hue <= 64) || (hue >= 330 && hue <= 360)) return "red";
+        else if (hue >= 200 && hue <= 260) return "blue";
+        else if (hue >= 65 && hue <= 100) return "yellow";
+        return "unknown";
+    }
+
+    private boolean isSampleDetected() {
+        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+        float[] hsv = new float[3];
+        Color.colorToHSV(colors.toColor(), hsv);
+        String color = classifyColor(hsv[0], hsv[1], hsv[2]);
+        return !color.equals("unknown");
+    }
+
+    public void updateOuttakeStateMachine() {
+        switch (currentOuttakeState) {
+            case IDLE:
+                break;
+
+            case MOVING_UP_INITIAL:
+                targetPosition = 1500; // Start raising
+                currentOuttakeState = OuttakeState.CHECKING_SAMPLE_WHILE_RAISING;
+                stateTimer.reset();
+                break;
+
+            case CHECKING_SAMPLE_WHILE_RAISING:
+                if (stateTimer.milliseconds() > 200) { // Allow sensor time to stabilize
+                    if (!isSampleDetected()) {
+                        // No sample detected, assume successful transfer
+                        currentOuttakeState = OuttakeState.COMPLETE;
+                    } else {
+                        // Sample still in intake, lower before retrying
+                        targetPosition = 285;
+                        currentOuttakeState = OuttakeState.RETRYING_LOWER;
+                    }
+                }
+                break;
+
+            case RETRYING_LOWER:
+                if (Math.abs(outtakeSlidesRightPosition - targetPosition) <= 20) {
+                    claw.setPosition(openClawSample); // Open claw
+                    stateTimer.reset();
+                    currentOuttakeState = OuttakeState.RETRYING_GRAB;
+                }
+                break;
+
+            case RETRYING_GRAB:
+                if (stateTimer.milliseconds() > 500) {
+                    claw.setPosition(closeClawSample); // Close claw
+                    targetPosition = 1500; // Move up again
+                    currentOuttakeState = OuttakeState.MOVING_UP_RETRY;
+                }
+                break;
+
+            case MOVING_UP_RETRY:
+                if (Math.abs(outtakeSlidesRightPosition - targetPosition) <= 20) {
+                    stateTimer.reset();
+                    currentOuttakeState = OuttakeState.FINAL_CHECK;
+                }
+                break;
+
+            case FINAL_CHECK:
+                if (stateTimer.milliseconds() > 200) {
+                    if (!isSampleDetected()) {
+                        // If sample is confirmed in claw, don't go back down
+                        currentOuttakeState = OuttakeState.COMPLETE;
+                    } else {
+                        // If sample is missing, retry the process
+                        targetPosition = 285;
+                        claw.setPosition(openClawSample);
+                        currentOuttakeState = OuttakeState.COMPLETE;
+                    }
+                }
+                break;
+
+            case COMPLETE:
+                // Ensure the arm only moves after confirming sample presence
+                if (!isSampleDetected()) {
+                    armLeft.setPosition(armLeft2Sample);
+                    armRight.setPosition(armRight2Sample);
+                    wrist.setPosition(wrist2Sample);
+                }
+                // Reset or prepare for next cycle
+                break;
+        }
+
+        // Ensure PID runs continuously
+        updateVerticalPID();
+    }
+
+    public void updateVerticalPID() {
+        double power = pidController.calculatePower(targetPosition, outtakeSlidesRightPosition);
+        outtakeSlidesLeft.setPower(-power);
+        outtakeSlidesRight.setPower(-power);
+    }
 
     public void stop(){
         th_intake.th_kill();
@@ -634,6 +948,4 @@ public abstract class ThreadTeleLibV2 extends OpMode {
         outtakeSlidesRight.setPower(0);
         intakeSlides.setPower(0);
     }
-
-
 }
