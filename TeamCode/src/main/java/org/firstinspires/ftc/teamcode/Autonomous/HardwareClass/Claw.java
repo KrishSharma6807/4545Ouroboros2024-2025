@@ -42,7 +42,7 @@ public class Claw {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             timer.reset();
-            while(timer.seconds() < .5){
+            while(timer.seconds() < .75){
 
             }
             claw.setPosition(openClaw);
