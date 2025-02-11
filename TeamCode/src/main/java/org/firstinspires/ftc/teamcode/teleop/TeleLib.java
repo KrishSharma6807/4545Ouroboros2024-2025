@@ -114,6 +114,7 @@ public abstract class TeleLib extends OpMode {
         }else if (gamepad2.a && claw.getPosition() == -1 || claw.getPosition() != -1 || claw.getPosition() != 1) {
             claw.setPosition(1);
         }
+        
     }
      public void kill() {
          bl.setPower(0);
