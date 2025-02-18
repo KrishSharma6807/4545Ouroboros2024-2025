@@ -3,9 +3,12 @@ import java.util.*;
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.opMode;
 
+import android.graphics.Color;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -39,4 +42,5 @@ public class Intake {
         time.reset();
         intake.setPower(-1);
     }
+
 }

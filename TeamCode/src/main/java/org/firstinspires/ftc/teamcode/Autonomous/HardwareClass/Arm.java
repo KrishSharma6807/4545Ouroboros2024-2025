@@ -26,8 +26,10 @@ public class Arm {
 
     public static double armLeft1Sample = .7;
     public static double armLeft2Sample = .1;
+
     public static double armRight1Sample = 0.4;
     public static double armRight2Sample = 1;
+
     public static double wrist1Sample = 1;
     public static double wrist2Sample = .5;
 
@@ -99,10 +101,6 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket packet) {
             armLeft.setPosition(armLeft2Sample);
             armRight.setPosition(armRight2Sample);
-            timer.reset();
-            while(timer.seconds() < 1){
-
-            }
             wrist.setPosition(wrist2Sample);
             return false;
         }
@@ -117,10 +115,6 @@ public class Arm {
         public boolean run(@NonNull TelemetryPacket packet) {
             armLeft.setPosition(armLeft1Sample);
             armRight.setPosition(armRight1Sample);
-            timer.reset();
-            while(timer.seconds() < 1){
-
-            }
             wrist.setPosition(wrist1Sample);
             return false;
         }
