@@ -19,7 +19,7 @@ public class Claw {
     public static double openClaw = 1;
     public Servo claw;
     public Servo clawSpin;
-    ElapsedTime timer = new ElapsedTime();
+    private ElapsedTime timer = new ElapsedTime();
 
     public Claw(HardwareMap hardwareMap) {
         claw = hardwareMap.get(Servo.class, "claw");
@@ -42,7 +42,7 @@ public class Claw {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             timer.reset();
-            while(timer.seconds() < .75){
+            while(timer.seconds() < 1.5){
 
             }
             claw.setPosition(openClaw);
@@ -58,7 +58,7 @@ public class Claw {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             timer.reset();
-            while(timer.seconds() < .3){
+            while(timer.seconds() < 1.2){
             }
             claw.setPosition(openClaw);
             return false;
@@ -67,6 +67,7 @@ public class Claw {
     public Action openClawWaitShort() {
         return new OpenClawWaitShort();
     }
+
 
     public class CloseClaw implements Action {
 
@@ -80,5 +81,23 @@ public class Claw {
 
     public Action closeClaw() {
         return new CloseClaw();
+    }
+
+    public class CloseClawWait implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            timer.reset();
+            while(timer.seconds() < .5){
+
+            }
+            claw.setPosition(closeClaw);
+            return false;
+        }
+    }
+
+
+    public Action closeClawWait() {
+        return new CloseClawWait();
     }
 }

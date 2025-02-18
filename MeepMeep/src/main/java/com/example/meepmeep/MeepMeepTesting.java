@@ -22,19 +22,21 @@ public class MeepMeepTesting {
     public static double baseTransVel = 40;
     public static double baseAngularVel = Math.PI;
     public static double xPosObserve = 38;
-    public static double yPosOverserve = -60;
+    public static double yPosOverserve = -30;
     public static double rightHeading = 90;
+    public static double ySpike = -14;
     public static double xSpike1 = 47;
     public static double xSpike2 = 57;
+    public static double xSpike3 = 65;
 
     public static double xSpike1First = 25;
 //    public static double xPosBar = 2;
 //    public static double yPosBar = 35;
     public static double yFinal = -30;
 
-    public static double bucketX = 56;
-    public static double bucketY = 56;
-    public static double bucketHeading = -135;
+    public static double bucketX = -56;
+    public static double bucketY = -56;
+    public static double bucketHeading = 45;
 
     public static double spikeX1 = 47;
     public static double spikeY1 = 38;
@@ -53,12 +55,12 @@ public class MeepMeepTesting {
 
         RoadRunnerBotEntity myBot = new DefaultBotBuilder(meepMeep)
                 //Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(60, 60, Math.toRadians(180) * 3, Math.toRadians(180) * 3, 11.3)
+                .setConstraints(60, 60, Math.toRadians(180) * 3, Math.toRadians(180) * 3, 12)
                 .build();
 
-        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(10, -63, Math.toRadians(90)))
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-20, -63, Math.toRadians(-90)))
                 //THREE SPECI 2 HUMAN PLAYER
-//                splineToLinearHeading(new Pose2d(xPosBar,yPosBar, Math.toRadians(90)), Math.toRadians(SplineHeading))
+//                .splineToLinearHeading(new Pose2d(xPosBar,yPosBar, Math.toRadians(90)), Math.toRadians(SplineHeading))
 //                        .lineToY(yFinal, new TranslationalVelConstraint(baseTransVel), baseAccelConstraint)
 //
 //                        .setTangent(Math.toRadians(-90))
@@ -89,7 +91,7 @@ public class MeepMeepTesting {
 //                        .lineToY(yFinal, new TranslationalVelConstraint(baseTransVel), baseAccelConstraint)
 //                        .setTangent(Math.toRadians(-90))
 //                        .splineToLinearHeading(new Pose2d(xPosObserve,yPosOverserve + 5, Math.toRadians(rightHeading)),Math.toRadians(-90))
-//                        .lineToY(yPosOverserve).
+//                        .lineToY(yPosOverserve)
 
                 //3 SPECI 1 HUMAN PLAYER
 //                .splineToLinearHeading(new Pose2d(xPosBar,yPosBar, Math.toRadians(90)), Math.toRadians(SplineHeading))
@@ -156,6 +158,56 @@ public class MeepMeepTesting {
 //                .splineToLinearHeading(new Pose2d(bucketX,bucketY, Math.toRadians(bucketHeading)), Math.toRadians(100))
 //                .setTangent(Math.toRadians(-90))
 //                .splineToLinearHeading(new Pose2d(parkX,parkY, Math.toRadians(0)), Math.toRadians(180))
+
+
+
+//                .setTangent(Math.toRadians(135))
+//                .splineToLinearHeading(new Pose2d(bucketX, bucketY, Math.toRadians(bucketHeading)), Math.toRadians(-135))
+//                .setTangent(Math.toRadians(35))
+//                .splineToLinearHeading(new Pose2d(-25, -10, Math.toRadians(180)), Math.toRadians(0))
+//                .lineToX(-20)
+                .splineToLinearHeading(new Pose2d(xPosBar,yPosBar, Math.toRadians(-90)), Math.toRadians(SplineHeading))
+                //.lineToY(yFinal, new TranslationalVelConstraint(baseTransVel), baseAccelConstraint)
+
+
+                .setTangent(Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(40, -30, Math.toRadians(-rightHeading)), Math.toRadians(55))
+                .splineToLinearHeading(new Pose2d(40, -14, Math.toRadians(-rightHeading)), Math.toRadians(0))
+                .setTangent(0)
+                .splineToLinearHeading(new Pose2d(xSpike1, ySpike, Math.toRadians(-rightHeading)), Math.toRadians(0))
+
+
+                .setTangent(Math.toRadians(-90))
+                .lineToY(yPosOverserve)
+
+                .setTangent(Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(xSpike1 + 3, ySpike + 2, Math.toRadians(-90)), Math.toRadians(50))
+                .splineToLinearHeading(new Pose2d(xSpike2, yPosOverserve, Math.toRadians(-90)), Math.toRadians(-90))
+
+                .setTangent(Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(xSpike3 - 3, ySpike + 2, Math.toRadians(-90)), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(xSpike3, ySpike + 2, Math.toRadians(-90)), Math.toRadians(-90))
+                .setTangent(Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(xSpike3, yPosOverserve-34 , Math.toRadians(-90)), Math.toRadians(-90))
+
+                .setTangent(Math.toRadians(135))
+                .splineToLinearHeading(new Pose2d(xPosBar - 2,yPosBar+10, Math.toRadians(-90)), Math.toRadians(SplineHeading))
+
+                .setTangent(Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(xPosObserve, yPosOverserve-34 , Math.toRadians(-90)), Math.toRadians(-90))
+
+                .setTangent(Math.toRadians(135))
+                .splineToLinearHeading(new Pose2d(xPosBar - 4,yPosBar+10, Math.toRadians(-90)), Math.toRadians(SplineHeading))
+
+                .setTangent(Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(xPosObserve, yPosOverserve-34 , Math.toRadians(-90)), Math.toRadians(-90))
+
+                .setTangent(Math.toRadians(135))
+                .splineToLinearHeading(new Pose2d(xPosBar - 6,yPosBar+10, Math.toRadians(-90)), Math.toRadians(SplineHeading))
+
+                .setTangent(Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(xPosObserve, yPosOverserve-34 , Math.toRadians(-90)), Math.toRadians(-90))
+
 
 
 

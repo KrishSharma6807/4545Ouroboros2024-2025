@@ -2,9 +2,8 @@ package org.firstinspires.ftc.teamcode.threadTeleOp;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.teleop.TeleLib;
-//@com.qualcomm.robotcore.eventloop.opmode.TeleOp
-public class ThreadTeleOpV2 extends ThreadTeleLibV2 {
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp
+public class ThreadTeleOpBLUE extends ThreadTeleLibBLUE {
     private boolean wasBumperPressed = false;
 
     private ElapsedTime loopTimer;

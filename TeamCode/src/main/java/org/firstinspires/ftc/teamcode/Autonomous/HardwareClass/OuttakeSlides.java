@@ -22,11 +22,11 @@ public class OuttakeSlides {
 
     public static double kP = .0047;
     public static double kI = 0.0;
-    public static double kD = .0;
-    public static double kF = 0.15;
+    public static double kD = .001;
+    public static double kF = 0.1;
     CustomPID pidController = new CustomPID(kP, kI, kD, kF);
 
-    ElapsedTime timer = new ElapsedTime();
+    private ElapsedTime timer = new ElapsedTime();
 
 
 
@@ -50,7 +50,7 @@ public class OuttakeSlides {
 
     }
     class PIDActionUpSpecimen extends InitLoopAction {
-        private final int target = 1370;  // Consistent target
+        private final int target = 1600;  // Consistent target
 
         @Override
         public void init() {
@@ -91,8 +91,8 @@ public class OuttakeSlides {
         @Override
         public boolean loop(TelemetryPacket p) {
             int position = -outtakeSlidesRight.getCurrentPosition();
-            double power = pidController.calculatePower(450, -outtakeSlidesRight.getCurrentPosition());
-            target = 450;
+            double power = pidController.calculatePower(550, -outtakeSlidesRight.getCurrentPosition());
+            target = 550;
             p.put("Motor Info", "Target: " + target + "; Error " + (target - position) + "; Power: " + power + "; currentPos" + position);
 
             outtakeSlidesLeft.setPower(-power);
@@ -293,7 +293,7 @@ public class OuttakeSlides {
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
                 timer.reset();
-                while(timer.seconds() < .3){
+                while(timer.seconds() < 1.2){
 
                 }
                 double power = pidController.calculatePower(0, -outtakeSlidesRight.getCurrentPosition());
