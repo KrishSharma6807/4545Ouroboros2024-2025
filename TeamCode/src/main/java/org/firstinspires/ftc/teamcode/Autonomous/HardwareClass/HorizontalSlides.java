@@ -34,5 +34,29 @@ public class HorizontalSlides {
     public Action returnIntakeSlides() {
         return new returnIntakeSlides();
     }
+
+    public class returnIntakeSlidesInfinite implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            intakeSlides.setPower(-.5);
+            return true;
+        }
+    }
+
+    public Action returnIntakeSlidesInfinite() { return new returnIntakeSlides(); }
+
+    public class extendIntakeSlidesInfinite implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            intakeSlides.setPower(.5);
+            return true;
+        }
+    }
+
+    public Action extendIntakeSlidesInfinite() {
+        return new extendIntakeSlidesInfinite();
+    }
 }
 

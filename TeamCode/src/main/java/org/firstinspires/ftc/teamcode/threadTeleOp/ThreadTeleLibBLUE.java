@@ -53,7 +53,6 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
 
     public ThreadHandler th_outtake;
     public ThreadHandler th_intake;
-    public ThreadHandler armSystems;
 
     //TelemetryPacket
     public static double kP = .004;
@@ -111,13 +110,13 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
     public static double armLeft1Sample = .7;
     public static double armLeft2Sample = .1;//1 is max, .25 is min
 
-    public static double armRight1Specimen = .0;
+    public static double armRight1Specimen = 1;
     public static double armRight2Specimen = .65;//.2 is max, 1 is min (tune min more)
-    public static double armRight3Specimen = 1;
+    public static double armRight3Specimen = .55;
 
-    public static double armLeft1Specimen = 1;
-    public static double armLeft2Specimen = .45;
-    public static double armLeft3Specimen = 0;
+    public static double armLeft1Specimen = .25;
+    public static double armLeft2Specimen = .7;
+    public static double armLeft3Specimen = .8;
 
     public static double armRight1Sample = 0.4;
     public static double armRight2Sample = 1;
@@ -135,8 +134,8 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
     public static double openClawSample = 1;
 
     public static double wrist1Specimen = .31;
-    public static double wrist2Specimen = .61;
-    public static double wrist3Specimen = .15;
+    public static double wrist2Specimen = .63;
+    public static double wrist3Specimen = .63;
 
     public static double wrist1Sample = 1;
     public static double wrist2Sample = .5;
@@ -198,7 +197,6 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
 
         th_intake = new ThreadHandler();
         th_outtake = new ThreadHandler();
-        armSystems = new ThreadHandler();
 
         armRight.setDirection(Servo.Direction.REVERSE);
         armLeft.setDirection(Servo.Direction.REVERSE);
@@ -357,54 +355,6 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
             ElapsedTime time = new ElapsedTime();
             time.reset();
             runToHorizPID();
-        }
-
-    });
-
-    Thread specDown = new Thread(new Runnable() {
-
-        @Override
-        public void run() {
-            armLeft.setPosition(armLeft1Specimen);
-            armRight.setPosition(armRight1Specimen);
-            claw.setPosition(closeClawSpecimen);
-            ElapsedTime time = new ElapsedTime();
-            time.reset();
-            wrist.setPosition(wrist1Specimen);
-        }
-
-    });
-
-    Thread specUpMiddle = new Thread(new Runnable() {
-
-        @Override
-        public void run() {
-            armLeft.setPosition(armLeft2Specimen);
-            armRight.setPosition(armRight2Specimen);
-            claw.setPosition(closeClawSpecimen);
-            ElapsedTime time = new ElapsedTime();
-            time.reset();
-            while(time.seconds() < .3){
-
-            }
-            wrist.setPosition(wrist2Specimen);
-        }
-
-    });
-
-    Thread specUpFull = new Thread(new Runnable() {
-
-        @Override
-        public void run() {
-            armLeft.setPosition(armLeft3Specimen);
-            armRight.setPosition(armRight3Specimen);
-            claw.setPosition(closeClawSpecimen);
-            ElapsedTime time = new ElapsedTime();
-            time.reset();
-            while(time.seconds() < .3){
-
-            }
-            wrist.setPosition(wrist3Specimen);
         }
 
     });
@@ -681,15 +631,24 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
             armTogglePressed = true;
             switch (currentArmState) {
                 case POSITION_1:
-                    armSystems.queue(specDown);
+                    armLeft.setPosition(armLeft1Specimen);
+                    armRight.setPosition(armRight1Specimen);
+                    wrist.setPosition(wrist1Specimen);
+                    claw.setPosition(closeClawSpecimen);
                     currentArmState = ArmStateSpecimen.POSITION_2;
                     break;
                 case POSITION_2:
-                    armSystems.queue(specUpMiddle);
+                    armLeft.setPosition(armLeft2Specimen);
+                    armRight.setPosition(armRight2Specimen);
+                    wrist.setPosition(wrist2Specimen);
+                    claw.setPosition(closeClawSpecimen);
                     currentArmState = ArmStateSpecimen.POSITION_3;
                     break;
                 case POSITION_3:
-                    armSystems.queue(specUpFull);
+                    armLeft.setPosition(armLeft3Specimen);
+                    armRight.setPosition(armRight3Specimen);
+                    wrist.setPosition(wrist3Specimen);
+                    claw.setPosition(closeClawSpecimen);
                     currentArmState = ArmStateSpecimen.POSITION_1;
                     break;
             }
@@ -732,10 +691,10 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
 //    }
 
     public void intake() {
-        if(gamepad2.b) {
+        if(gamepad2.y) {
             intake.setPower(-1);
             intakeActive = false;
-        } else if (gamepad2.y) {
+        } else if (gamepad2.b) {
             intake.setPower(1);
             intakeActive = true;
         } else {
