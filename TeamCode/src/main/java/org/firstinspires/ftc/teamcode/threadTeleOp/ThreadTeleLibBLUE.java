@@ -110,12 +110,12 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
     public static double armLeft1Sample = .7;
     public static double armLeft2Sample = .1;//1 is max, .25 is min
 
-    public static double armRight1Specimen = 1;
-    public static double armRight2Specimen = .65;//.2 is max, 1 is min (tune min more)
+    public static double armRight1Specimen = .4;
+    public static double armRight2Specimen = 1;//.2 is max, 1 is min (tune min more)
     public static double armRight3Specimen = .55;
 
-    public static double armLeft1Specimen = .25;
-    public static double armLeft2Specimen = .7;
+    public static double armLeft1Specimen = .55;
+    public static double armLeft2Specimen = 0;
     public static double armLeft3Specimen = .8;
 
     public static double armRight1Sample = 0.4;
@@ -133,8 +133,8 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
     public static double closeClawSample = .5;
     public static double openClawSample = 1;
 
-    public static double wrist1Specimen = .31;
-    public static double wrist2Specimen = .63;
+    public static double wrist1Specimen = .95;
+    public static double wrist2Specimen = .15;
     public static double wrist3Specimen = .63;
 
     public static double wrist1Sample = 1;
@@ -642,15 +642,15 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
                     armRight.setPosition(armRight2Specimen);
                     wrist.setPosition(wrist2Specimen);
                     claw.setPosition(closeClawSpecimen);
-                    currentArmState = ArmStateSpecimen.POSITION_3;
-                    break;
-                case POSITION_3:
-                    armLeft.setPosition(armLeft3Specimen);
-                    armRight.setPosition(armRight3Specimen);
-                    wrist.setPosition(wrist3Specimen);
-                    claw.setPosition(closeClawSpecimen);
                     currentArmState = ArmStateSpecimen.POSITION_1;
                     break;
+//                case POSITION_3:
+//                    armLeft.setPosition(armLeft3Specimen);
+//                    armRight.setPosition(armRight3Specimen);
+//                    wrist.setPosition(wrist3Specimen);
+//                    claw.setPosition(closeClawSpecimen);
+//                    currentArmState = ArmStateSpecimen.POSITION_1;
+//                    break;
             }
         } else if (!gamepad2.a) {
             armTogglePressed = false;

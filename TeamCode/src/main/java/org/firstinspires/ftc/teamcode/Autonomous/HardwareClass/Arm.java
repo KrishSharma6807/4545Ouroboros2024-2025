@@ -14,17 +14,15 @@ public class Arm {
     public Servo armLeft;
     public Servo armRight;
     public Servo wrist;
-    public static double armRight1Specimen = .0;
-    public static double armRight2Specimen = .65;//.2 is max, 1 is min (tune min more)
-    public static double armRight3Specimen = .8;
+    public static double armRight1Specimen = .4;
+    public static double armRight2Specimen = 1;//.2 is max, 1 is min (tune min more)
 
-    public static double armLeft1Specimen = 1;
-    public static double armLeft2Specimen = .45;
-    public static double armLeft3Specimen = .3;
 
-    public static double wrist1Specimen = .31;
-    public static double wrist2Specimen = .61;
-    public static double wrist3Specimen = .61;
+    public static double armLeft1Specimen = .55;
+    public static double armLeft2Specimen = 0;
+
+    public static double wrist1Specimen = .95;
+    public static double wrist2Specimen = .15;
 
     public static double armLeft1Sample = .7;
     public static double armLeft2Sample = .1;
@@ -48,12 +46,13 @@ public class Arm {
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
+            timer.reset();
+            while(timer.seconds() < .3){
+
+            }
             armLeft.setPosition(armLeft2Specimen);
             armRight.setPosition(armRight2Specimen);
             timer.reset();
-            while(timer.seconds() < 0.3){
-
-            }
             wrist.setPosition(wrist2Specimen);
             return false;
         }
@@ -66,9 +65,9 @@ public class Arm {
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            armLeft.setPosition(armLeft3Specimen);
-            armRight.setPosition(armRight3Specimen);
-            wrist.setPosition(wrist3Specimen);
+//            armLeft.setPosition(armLeft3Specimen);
+//            armRight.setPosition(armRight3Specimen);
+//            wrist.setPosition(wrist3Specimen);
             timer.reset();
             while(timer.seconds() < 1){
 

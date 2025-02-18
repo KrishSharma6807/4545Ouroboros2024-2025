@@ -91,7 +91,7 @@ public class OuttakeSlides {
         @Override
         public boolean loop(TelemetryPacket p) {
             int position = -outtakeSlidesRight.getCurrentPosition();
-            double power = pidController.calculatePower(550, -outtakeSlidesRight.getCurrentPosition());
+            double power = pidController.calculatePower(600, -outtakeSlidesRight.getCurrentPosition());
             target = 550;
             p.put("Motor Info", "Target: " + target + "; Error " + (target - position) + "; Power: " + power + "; currentPos" + position);
 
@@ -293,7 +293,7 @@ public class OuttakeSlides {
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
                 timer.reset();
-                while(timer.seconds() < 1.2){
+                while(timer.seconds() < .25){
 
                 }
                 double power = pidController.calculatePower(0, -outtakeSlidesRight.getCurrentPosition());
