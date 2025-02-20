@@ -14,6 +14,7 @@ public class Arm {
     public Servo armLeft;
     public Servo armRight;
     public Servo wrist;
+    public Servo claw;
     public static double armRight1Specimen = .4;
     public static double armRight2Specimen = 1;//.2 is max, 1 is min (tune min more)
 
@@ -39,6 +40,7 @@ public class Arm {
         armLeft = hardwareMap.get(Servo.class, "armLeft");
         armRight = hardwareMap.get(Servo.class, "armRight");
         wrist = hardwareMap.get(Servo.class, "wrist");
+        claw = hardwareMap.get(Servo.class, "claw");
 
         armRight.setDirection(Servo.Direction.REVERSE);
         armLeft.setDirection(Servo.Direction.REVERSE);
@@ -54,7 +56,6 @@ public class Arm {
             }
             armLeft.setPosition(armLeft2Specimen);
             armRight.setPosition(armRight2Specimen);
-            timer.reset();
             wrist.setPosition(wrist2Specimen);
             return false;
         }
@@ -85,9 +86,14 @@ public class Arm {
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
+            claw.setPosition(1);
+            timer.reset();
+            while(timer.seconds() < 0.15){
+
+            }
+            wrist.setPosition(wrist1Specimen);
             armLeft.setPosition(armLeft1Specimen);
             armRight.setPosition(armRight1Specimen);
-            wrist.setPosition(wrist1Specimen);
             return false;
         }
     }

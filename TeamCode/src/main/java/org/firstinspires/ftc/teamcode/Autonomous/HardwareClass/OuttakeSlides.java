@@ -91,8 +91,8 @@ public class OuttakeSlides {
         @Override
         public boolean loop(TelemetryPacket p) {
             int position = -outtakeSlidesRight.getCurrentPosition();
-            double power = pidController.calculatePower(600, -outtakeSlidesRight.getCurrentPosition());
-            target = 550;
+            double power = pidController.calculatePower(590, -outtakeSlidesRight.getCurrentPosition());
+            target = 590;
             p.put("Motor Info", "Target: " + target + "; Error " + (target - position) + "; Power: " + power + "; currentPos" + position);
 
             outtakeSlidesLeft.setPower(-power);
@@ -264,8 +264,8 @@ public class OuttakeSlides {
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
                 double power = pidController.calculatePower(0, -outtakeSlidesRight.getCurrentPosition());
-                outtakeSlidesLeft.setPower(-power);
-                outtakeSlidesRight.setPower(-power);
+                outtakeSlidesLeft.setPower(1);
+                outtakeSlidesRight.setPower(1);
 
 
                 initialized = true;
@@ -291,14 +291,12 @@ public class OuttakeSlides {
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            if (!initialized) {
-                timer.reset();
-                while(timer.seconds() < .25){
+            timer.reset();
 
-                }
+            if (!initialized) {
                 double power = pidController.calculatePower(0, -outtakeSlidesRight.getCurrentPosition());
-                outtakeSlidesLeft.setPower(-power);
-                outtakeSlidesRight.setPower(-power);
+                outtakeSlidesLeft.setPower(1);
+                outtakeSlidesRight.setPower(1);
 
 
                 initialized = true;

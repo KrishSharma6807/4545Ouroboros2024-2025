@@ -50,7 +50,7 @@ public class HorizontalSlides {
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            intakeSlides.setPower(.5);
+            intakeSlides.setPower(1);
             return true;
         }
     }

@@ -142,7 +142,7 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
 
     public static double clawSpin1 = .38;
     public static double clawSpin2 = .38;
-
+    boolean armStateChange = false;
     private FtcDashboard dash;
     TelemetryPacket telemetryPacket;
     public enum OuttakeLiftState {
@@ -635,14 +635,21 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
                     armRight.setPosition(armRight1Specimen);
                     wrist.setPosition(wrist1Specimen);
                     claw.setPosition(closeClawSpecimen);
-                    currentArmState = ArmStateSpecimen.POSITION_2;
+                    if(!armStateChange){
+                        armStateChange = true;
+                        currentArmState = ArmStateSpecimen.POSITION_2;
+                    }
+
                     break;
                 case POSITION_2:
                     armLeft.setPosition(armLeft2Specimen);
                     armRight.setPosition(armRight2Specimen);
                     wrist.setPosition(wrist2Specimen);
                     claw.setPosition(closeClawSpecimen);
-                    currentArmState = ArmStateSpecimen.POSITION_1;
+                    if(!armStateChange){
+                        armStateChange = true;
+                        currentArmState = ArmStateSpecimen.POSITION_1;
+                    }
                     break;
 //                case POSITION_3:
 //                    armLeft.setPosition(armLeft3Specimen);
@@ -653,6 +660,7 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
 //                    break;
             }
         } else if (!gamepad2.a) {
+            armStateChange = false;
             armTogglePressed = false;
         }
     }
