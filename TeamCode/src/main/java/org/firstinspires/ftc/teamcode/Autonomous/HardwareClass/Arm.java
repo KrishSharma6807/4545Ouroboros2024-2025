@@ -15,23 +15,23 @@ public class Arm {
     public Servo armRight;
     public Servo wrist;
     public Servo claw;
-    public static double armRight1Specimen = .4;
+    public static double armRight1Specimen = .15;
     public static double armRight2Specimen = 1;//.2 is max, 1 is min (tune min more)
 
 
-    public static double armLeft1Specimen = .55;
-    public static double armLeft2Specimen = 0;
+    public static double armLeft1Specimen = .83;
+    public static double armLeft2Specimen = .3;
 
-    public static double wrist1Specimen = .95;
-    public static double wrist2Specimen = .15;
+    public static double wrist1Specimen = .85;
+    public static double wrist2Specimen = .085;
 
-    public static double armLeft1Sample = .7;
-    public static double armLeft2Sample = .1;
+    public static double armLeft1Sample = .95;
+    public static double armLeft2Sample = .32;
 
-    public static double armRight1Sample = 0.4;
-    public static double armRight2Sample = 1;
+    public static double armRight1Sample = 0;
+    public static double armRight2Sample = .9;
 
-    public static double wrist1Sample = 1;
+    public static double wrist1Sample = .925;
     public static double wrist2Sample = .5;
 
     private ElapsedTime timer = new ElapsedTime();

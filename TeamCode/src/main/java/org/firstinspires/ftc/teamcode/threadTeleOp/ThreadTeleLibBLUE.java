@@ -107,19 +107,19 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
 
     double voltage = 0;
 
-    public static double armLeft1Sample = .7;
-    public static double armLeft2Sample = .1;//1 is max, .25 is min
+    public static double armLeft1Sample = .95;
+    public static double armLeft2Sample = .32;//1 is max, .25 is min
 
-    public static double armRight1Specimen = .4;
+    public static double armRight1Specimen = .15;
     public static double armRight2Specimen = 1;//.2 is max, 1 is min (tune min more)
     public static double armRight3Specimen = .55;
 
-    public static double armLeft1Specimen = .55;
-    public static double armLeft2Specimen = 0;
+    public static double armLeft1Specimen = .83;
+    public static double armLeft2Specimen = .3;
     public static double armLeft3Specimen = .8;
 
-    public static double armRight1Sample = 0.4;
-    public static double armRight2Sample = 1;
+    public static double armRight1Sample = 0;
+    public static double armRight2Sample = .9;
 
     public static double closeClawSpecimen = .5;
     public static double openClawSpecimen = 1;
@@ -131,13 +131,13 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
     public static double intakeTiltRightDown = .37;
 
     public static double closeClawSample = .5;
-    public static double openClawSample = 1;
+    public static double openClawSample = .85;
 
-    public static double wrist1Specimen = .95;
-    public static double wrist2Specimen = .15;
+    public static double wrist1Specimen = .85;
+    public static double wrist2Specimen = .085;
     public static double wrist3Specimen = .63;
 
-    public static double wrist1Sample = 1;
+    public static double wrist1Sample = .925;
     public static double wrist2Sample = .5;
 
     public static double clawSpin1 = .38;
@@ -441,7 +441,32 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
             armRight.getController().pwmEnable();
         }
     }
-    public void ArcadeDrive() {
+    public void ArcadeDriveBar() {
+
+        double left_stick_x = gamepad1.left_stick_x;
+        double left_stick_y = gamepad1.left_stick_y;
+        double right_stick_x = gamepad1.right_stick_x;
+
+        voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
+
+        double denominator = Math.max(Math.abs(gamepad1.left_stick_y) + Math.abs(gamepad1.left_stick_x) + Math.abs(gamepad1.right_stick_x), 1);
+
+        if (Math.abs(left_stick_x) > 0.1 ||
+                Math.abs(left_stick_y) >.1|| Math.abs(right_stick_x) > 0.1){
+            fr.setPower(/*voltage/13.5 **/ ((left_stick_y + left_stick_x) + right_stick_x) * -1);
+            fl.setPower(((left_stick_y - left_stick_x) - right_stick_x) * -1);
+            br.setPower(((left_stick_y - left_stick_x) + right_stick_x) * -1);
+            bl.setPower(((left_stick_y + left_stick_x) - right_stick_x) * -1);
+        }
+        else{
+            fl.setPower(0);
+            fr.setPower(0);
+            br.setPower(0);
+            bl.setPower(0);
+        }
+    }
+
+    public void ArcadeDriveIntake() {
 
         double left_stick_x = gamepad1.left_stick_x;
         double left_stick_y = gamepad1.left_stick_y;

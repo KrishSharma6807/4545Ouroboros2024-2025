@@ -5,19 +5,26 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp
 public class ThreadTeleOpBLUE extends ThreadTeleLibBLUE {
     private boolean wasBumperPressed = false;
+    private boolean wasAPressed = false;
 
     private ElapsedTime loopTimer;
     private gameMode mode;
+    private driveMode drivemode;
     double loopTime = 0.0;
     public enum gameMode {
         SAMPLE,
         SPECIMEN
+    };
+    public enum driveMode{
+        INTAKE,
+        BAR
     };
     @Override
     public void init() {
         super.init();
         loopTimer = new ElapsedTime();
         mode = gameMode.SPECIMEN;
+        drivemode = driveMode.INTAKE;
     }
 
     @Override
@@ -32,7 +39,6 @@ public class ThreadTeleOpBLUE extends ThreadTeleLibBLUE {
 
         update();
         telem();
-        ArcadeDrive();
         intake();
         horizSlides();
         intakeTilt();
@@ -54,6 +60,19 @@ public class ThreadTeleOpBLUE extends ThreadTeleLibBLUE {
         // Update bumper state
         wasBumperPressed = isBumperPressed;
 
+        boolean isAPressed = gamepad1.a;
+
+        if (isAPressed && !wasAPressed) { // Transition from unpressed to pressed
+            if (drivemode == driveMode.INTAKE) {
+                drivemode = driveMode.BAR;
+            } else if (drivemode == driveMode.BAR) {
+                drivemode = driveMode.INTAKE;
+            }
+        }
+
+        // Update bumper state
+        wasAPressed = isAPressed;
+
         // Handle mode-specific actions
         switch (mode) {
             case SAMPLE:
@@ -65,6 +84,15 @@ public class ThreadTeleOpBLUE extends ThreadTeleLibBLUE {
                 verticalSlidesSpecimen();
                 armSpecimen();
                 clawSpecimen();
+                break;
+        }
+
+        switch (drivemode) {
+            case INTAKE:
+                ArcadeDriveIntake();
+                break;
+            case BAR:
+                ArcadeDriveBar();
                 break;
         }
 

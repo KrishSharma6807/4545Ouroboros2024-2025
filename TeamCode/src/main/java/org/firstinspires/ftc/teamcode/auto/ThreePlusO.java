@@ -35,19 +35,19 @@ import page.j5155.expressway.core.actions.RaceParallelAction;
 public class
 
 ThreePlusO extends LinearOpMode {
-    public static double xPosBar = 10;
-    public static double yPosBar = -32;
+    public static double xPosBar = 15;
+    public static double yPosBar = -33;
     public static double SplineHeading = 90;
-    public static double baseAccelMin = -10;
-    public static double baseAccelMax = 25;
+    public static double baseAccelMin = -30;
+    public static double baseAccelMax = 50;
     public static double baseTransVel = 40;
     public static double baseAngularVel = Math.PI;
-    public static double xPosObserve = 38;
+    public static double xPosObserve = 40;
     public static double yPosOverserve = -64;
     public static double rightHeading = 90;
-    public static double ySpike = -14;
+    public static double ySpike = -16;
     public static double xSpike1 = 52;
-    public static double xSpike2 = 56;
+    public static double xSpike2 = 55;
     public static double xSpike3 = 70;
 
     public static double xSpike1First = 25;
@@ -75,15 +75,16 @@ ThreePlusO extends LinearOpMode {
 
         // actionBuilder builds from the drive steps passed to it
         TrajectoryActionBuilder toBar1 = drive.actionBuilder(initialPose)
+                .waitSeconds(0.1)
                 .setTangent(90)
-                .splineToLinearHeading(new Pose2d(xPosBar,yPosBar, Math.toRadians(-90)), Math.toRadians(SplineHeading));
+                .splineToLinearHeading(new Pose2d(xPosBar,yPosBar+1, Math.toRadians(-90)), Math.toRadians(SplineHeading));
 
         TrajectoryActionBuilder pushSpikes = toBar1.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-90))
                 .splineToLinearHeading(new Pose2d(40, -30, Math.toRadians(-rightHeading)), Math.toRadians(90))
                 .splineToLinearHeading(new Pose2d(40, -14, Math.toRadians(-rightHeading)), Math.toRadians(0))
                 .setTangent(0)
-                .splineToLinearHeading(new Pose2d(xSpike1, ySpike, Math.toRadians(-rightHeading)), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(xSpike1, ySpike, Math.toRadians(-90)), Math.toRadians(-90))
                 .setTangent(Math.toRadians(-90))
                 .splineToLinearHeading(new Pose2d(xSpike1, yPosOverserve+14, Math.toRadians(-90)), Math.toRadians(-90))
                 .setTangent(Math.toRadians(90))
@@ -93,8 +94,8 @@ ThreePlusO extends LinearOpMode {
                 .splineToLinearHeading(new Pose2d(xSpike3 - 3, ySpike, Math.toRadians(-90)), Math.toRadians(0))
                 .splineToLinearHeading(new Pose2d(xSpike3, ySpike, Math.toRadians(-90)), Math.toRadians(-90))
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(xSpike3, yPosOverserve+15, Math.toRadians(-90)), Math.toRadians(-90))
-                .lineToY(yPosOverserve+2);
+                .splineToLinearHeading(new Pose2d(xSpike3, yPosOverserve, Math.toRadians(-90)), Math.toRadians(-90) , new TranslationalVelConstraint(baseTransVel), baseAccelConstraint);
+                //.lineToY(yPosOverserve, new TranslationalVelConstraint(baseTransVel), baseAccelConstraint);
 
 //        TrajectoryActionBuilder pushSpike1 = toSpike1.endTrajectory().fresh()
 //                .setTangent(Math.toRadians(-90))
@@ -123,20 +124,20 @@ ThreePlusO extends LinearOpMode {
         TrajectoryActionBuilder backBar2 = toBar2.endTrajectory().fresh()
                 .splineToLinearHeading(new Pose2d(xPosBar, yPosBar-2 , Math.toRadians(-90)), Math.toRadians(-90));
 
-        TrajectoryActionBuilder toObserve2 = backBar2.endTrajectory().fresh()
+        TrajectoryActionBuilder toObserve2 = toBar2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(xPosObserve, yPosOverserve, Math.toRadians(-90)), Math.toRadians(-90));
+                .splineToLinearHeading(new Pose2d(xPosObserve, yPosOverserve, Math.toRadians(-90)), Math.toRadians(-70));
 
         TrajectoryActionBuilder toBar3 = toObserve2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(135))
-                .splineToLinearHeading(new Pose2d(xPosBar-=1,yPosBar, Math.toRadians(-90)), Math.toRadians(SplineHeading));
+                .splineToLinearHeading(new Pose2d(xPosBar-=1,yPosBar+1, Math.toRadians(-90)), Math.toRadians(SplineHeading));
 
         TrajectoryActionBuilder backBar3 = toBar3.endTrajectory().fresh()
                 .splineToLinearHeading(new Pose2d(xPosBar, yPosBar-2 , Math.toRadians(-90)), Math.toRadians(-90));
 
-        TrajectoryActionBuilder toObserve3 =  backBar3.endTrajectory().fresh()
+        TrajectoryActionBuilder toObserve3 =  toBar3.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(xPosObserve, yPosOverserve , Math.toRadians(-90)), Math.toRadians(-90));
+                .splineToLinearHeading(new Pose2d(xPosObserve, yPosOverserve , Math.toRadians(-90)), Math.toRadians(-70));
 
         TrajectoryActionBuilder toBar4 = toObserve3.endTrajectory().fresh()
                 .setTangent(Math.toRadians(135))
@@ -145,13 +146,20 @@ ThreePlusO extends LinearOpMode {
         TrajectoryActionBuilder backBar4 = toBar4.endTrajectory().fresh()
                 .splineToLinearHeading(new Pose2d(xPosBar, yPosBar-2 , Math.toRadians(-90)), Math.toRadians(-90));
 
-        TrajectoryActionBuilder toObserve4 = backBar4.endTrajectory().fresh()
+        TrajectoryActionBuilder toObserve4 = toBar4.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(xPosObserve, yPosOverserve , Math.toRadians(-90)), Math.toRadians(-90));
+                .splineToLinearHeading(new Pose2d(xPosObserve, yPosOverserve , Math.toRadians(-90)), Math.toRadians(-70));
+
+        TrajectoryActionBuilder toBar5 = toObserve4.endTrajectory().fresh()
+                .setTangent(Math.toRadians(135))
+                .splineToLinearHeading(new Pose2d(xPosBar-=1,yPosBar, Math.toRadians(-90)), Math.toRadians(SplineHeading));
+
+        TrajectoryActionBuilder backBar5 = toBar5.endTrajectory().fresh()
+                .splineToLinearHeading(new Pose2d(xPosBar, yPosBar-2 , Math.toRadians(-90)), Math.toRadians(-90));
 
         //waits
         TrajectoryActionBuilder waitShort = toBar3.endTrajectory().fresh()
-                .waitSeconds(.25);
+                .waitSeconds(.1);
         TrajectoryActionBuilder wait = toBar3.endTrajectory().fresh()
                 .waitSeconds(.75);
         TrajectoryActionBuilder waitLong = toBar3.endTrajectory().fresh()
@@ -170,6 +178,7 @@ ThreePlusO extends LinearOpMode {
         );
         Actions.runBlocking(
                 new ParallelAction(
+                        hSlides.returnIntakeSlides(),
                         slides.PIDGrab(),
                         toBar1.build()
                 )
@@ -201,11 +210,6 @@ ThreePlusO extends LinearOpMode {
                 new ParallelAction(
                         claw.openClaw(),
                         arm.downSpecimenArm(),
-                        backBar2.build()
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction(
                         toObserve2.build(),
                         slides.liftDownFull()
                 )
@@ -222,14 +226,9 @@ ThreePlusO extends LinearOpMode {
         Actions.runBlocking(
                 new ParallelAction(
                         claw.openClaw(),
-                        arm.downSpecimenArm(),
-                        backBar3.build()
-                )
-        );
-        Actions.runBlocking(
-                new ParallelAction(
                         slides.liftDownFull(),
-                        toObserve3.build()
+                        toObserve3.build(),
+                        arm.downSpecimenArm()
                 )
         );
         Actions.runBlocking(
@@ -246,13 +245,21 @@ ThreePlusO extends LinearOpMode {
                 new ParallelAction(
                         claw.openClaw(),
                         arm.downSpecimenArm(),
-                        backBar4.build()
+                        slides.liftDownFull(),
+                        toObserve4.build()
                 )
         );
         Actions.runBlocking(
                 new ParallelAction(
-                        slides.liftDownFull(),
-                        toObserve4.build()
+                        claw.closeClaw(),
+                        arm.upSpecimenArm(),
+                        slides.PIDGrab(),
+                        toBar5.build()
+                )
+        );
+        Actions.runBlocking(
+                new ParallelAction(
+                        claw.openClaw()
                 )
         );
     }
