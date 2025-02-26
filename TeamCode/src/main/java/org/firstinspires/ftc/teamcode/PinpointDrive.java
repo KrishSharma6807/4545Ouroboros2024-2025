@@ -40,9 +40,8 @@ public class PinpointDrive extends MecanumDrive {
          */
         //These are tuned for 3110-0002-0001 Product Insight #1
         // RR localizer note: These units are inches, presets are converted from mm (which is why they are inexact)
-        public double xOffset = 1.75;
-        public double yOffset = -4.6;
-
+        public double xOffset = /*1.81114173*/ 3;
+        public double yOffset = /*-4.348110236*/4.5;
         /*
         Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
         the goBILDA_SWINGARM_POD or the goBILDA_4_BAR_POD.
@@ -141,6 +140,21 @@ public class PinpointDrive extends MecanumDrive {
 
         return pinpoint.getVelocityRR();
     }
+
+    public Pose2d getPoseEstimate() {
+        return pose;
+    }
+    public double getY() {
+        return pose.position.y;
+    }
+
+    public double getX() {
+        return pose.position.x;
+    }
+    public double getHeading() {
+        return pose.heading.toDouble();
+    }
+
 
 
     // for debug logging

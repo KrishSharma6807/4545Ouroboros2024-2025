@@ -20,34 +20,29 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.Arm;
 import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.Claw;
 import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.HorizontalSlides;
-import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.IntakeAuto;
+import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.Intake;
 import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.OuttakeSlides;
 import org.firstinspires.ftc.teamcode.PinpointDrive;
-import org.firstinspires.ftc.teamcode.R;
 
 import java.util.Arrays;
 
-import page.j5155.expressway.core.actions.RaceParallelAction;
-
 
 @Config
-@Autonomous(name = "ThreePlusO", group = "Autonomous")
-public class
-
-ThreePlusO extends LinearOpMode {
-    public static double xPosBar = 15;
+@Autonomous(name = "FivePlusO", group = "Autonomous")
+public class FivePlusO extends LinearOpMode {
+    public static double xPosBar = 17;
     public static double yPosBar = -33;
     public static double SplineHeading = 90;
-    public static double baseAccelMin = -30;
+    public static double baseAccelMin = -20;
     public static double baseAccelMax = 50;
     public static double baseTransVel = 40;
     public static double baseAngularVel = Math.PI;
     public static double xPosObserve = 40;
     public static double yPosOverserve = -64;
     public static double rightHeading = 90;
-    public static double ySpike = -16;
+    public static double ySpike = -20;
     public static double xSpike1 = 52;
-    public static double xSpike2 = 55;
+    public static double xSpike2 = 53;
     public static double xSpike3 = 70;
 
     public static double xSpike1First = 25;
@@ -60,12 +55,12 @@ ThreePlusO extends LinearOpMode {
     @Override
     public void runOpMode() {
         // instantiate your MecanumDrive at a particular pose.
-        Pose2d initialPose = new Pose2d(10, -63, Math.toRadians(-90));
+        Pose2d initialPose = new Pose2d(33, -63, Math.toRadians(-90));
         PinpointDrive drive = new PinpointDrive(hardwareMap, initialPose);
         OuttakeSlides slides = new OuttakeSlides(hardwareMap);
         Claw claw = new Claw(hardwareMap);
         Arm arm = new Arm(hardwareMap);
-        IntakeAuto intake = new IntakeAuto(hardwareMap);
+        Intake intake = new Intake(hardwareMap);
         HorizontalSlides hSlides = new HorizontalSlides(hardwareMap);
         VelConstraint baseVelConstraint = new MinVelConstraint(Arrays.asList(
                 new TranslationalVelConstraint(baseTransVel),
@@ -119,18 +114,18 @@ ThreePlusO extends LinearOpMode {
 
         TrajectoryActionBuilder toBar2 = pushSpikes.endTrajectory().fresh()
                 .setTangent(Math.toRadians(135))
-                .splineToLinearHeading(new Pose2d(xPosBar-=1,yPosBar, Math.toRadians(-90)), Math.toRadians(SplineHeading));
+                .splineToLinearHeading(new Pose2d(xPosBar-1,yPosBar, Math.toRadians(-90)), Math.toRadians(SplineHeading));
 
         TrajectoryActionBuilder backBar2 = toBar2.endTrajectory().fresh()
                 .splineToLinearHeading(new Pose2d(xPosBar, yPosBar-2 , Math.toRadians(-90)), Math.toRadians(-90));
 
         TrajectoryActionBuilder toObserve2 = toBar2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(xPosObserve, yPosOverserve, Math.toRadians(-90)), Math.toRadians(-70));
+                .splineToLinearHeading(new Pose2d(xPosObserve, yPosOverserve+2, Math.toRadians(-90)), Math.toRadians(-70));
 
         TrajectoryActionBuilder toBar3 = toObserve2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(135))
-                .splineToLinearHeading(new Pose2d(xPosBar-=1,yPosBar+1, Math.toRadians(-90)), Math.toRadians(SplineHeading));
+                .splineToLinearHeading(new Pose2d(xPosBar-2,yPosBar+.5, Math.toRadians(-90)), Math.toRadians(SplineHeading));
 
         TrajectoryActionBuilder backBar3 = toBar3.endTrajectory().fresh()
                 .splineToLinearHeading(new Pose2d(xPosBar, yPosBar-2 , Math.toRadians(-90)), Math.toRadians(-90));
@@ -141,7 +136,7 @@ ThreePlusO extends LinearOpMode {
 
         TrajectoryActionBuilder toBar4 = toObserve3.endTrajectory().fresh()
                 .setTangent(Math.toRadians(135))
-                .splineToLinearHeading(new Pose2d(xPosBar-=1,yPosBar, Math.toRadians(-90)), Math.toRadians(SplineHeading));
+                .splineToLinearHeading(new Pose2d(xPosBar-3,yPosBar, Math.toRadians(-90)), Math.toRadians(SplineHeading));
 
         TrajectoryActionBuilder backBar4 = toBar4.endTrajectory().fresh()
                 .splineToLinearHeading(new Pose2d(xPosBar, yPosBar-2 , Math.toRadians(-90)), Math.toRadians(-90));
@@ -152,10 +147,10 @@ ThreePlusO extends LinearOpMode {
 
         TrajectoryActionBuilder toBar5 = toObserve4.endTrajectory().fresh()
                 .setTangent(Math.toRadians(135))
-                .splineToLinearHeading(new Pose2d(xPosBar-=1,yPosBar, Math.toRadians(-90)), Math.toRadians(SplineHeading));
+                .splineToLinearHeading(new Pose2d(xPosBar-4,yPosBar, Math.toRadians(-90)), Math.toRadians(SplineHeading));
 
         TrajectoryActionBuilder backBar5 = toBar5.endTrajectory().fresh()
-                .splineToLinearHeading(new Pose2d(xPosBar, yPosBar-2 , Math.toRadians(-90)), Math.toRadians(-90));
+                .splineToLinearHeading(new Pose2d(xPosBar, yPosBar-1 , Math.toRadians(-90)), Math.toRadians(-90));
 
         //waits
         TrajectoryActionBuilder waitShort = toBar3.endTrajectory().fresh()
@@ -226,9 +221,9 @@ ThreePlusO extends LinearOpMode {
         Actions.runBlocking(
                 new ParallelAction(
                         claw.openClaw(),
-                        slides.liftDownFull(),
+                        arm.downSpecimenArm(),
                         toObserve3.build(),
-                        arm.downSpecimenArm()
+                        slides.liftDownFull()
                 )
         );
         Actions.runBlocking(
@@ -258,8 +253,9 @@ ThreePlusO extends LinearOpMode {
                 )
         );
         Actions.runBlocking(
-                new ParallelAction(
-                        claw.openClaw()
+                new SequentialAction(
+                        claw.openClaw(),
+                        backBar5.build()
                 )
         );
     }

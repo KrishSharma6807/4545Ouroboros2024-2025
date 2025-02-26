@@ -23,12 +23,12 @@ public class OuttakeSlides {
     public static double kP = .0047;
     public static double kI = 0.0;
     public static double kD = .001;
-    public static double kF = 0.1;
+    public static double kF = 0.095;
     CustomPID pidController = new CustomPID(kP, kI, kD, kF);
 
     private ElapsedTime timer = new ElapsedTime();
 
-
+    public static double rightEncoder = 0;
 
     public OuttakeSlides(HardwareMap hardwareMap) {
         outtakeSlidesLeft = hardwareMap.get(DcMotorEx.class, "outtakeSlidesLeft");
@@ -90,7 +90,7 @@ public class OuttakeSlides {
 
         @Override
         public boolean loop(TelemetryPacket p) {
-            int position = -outtakeSlidesRight.getCurrentPosition();
+            double position = -outtakeSlidesRight.getCurrentPosition();
             double power = pidController.calculatePower(600, -outtakeSlidesRight.getCurrentPosition());
             target = 600;
             p.put("Motor Info", "Target: " + target + "; Error " + (target - position) + "; Power: " + power + "; currentPos" + position);
@@ -101,6 +101,7 @@ public class OuttakeSlides {
                 outtakeSlidesLeft.setPower(0);
                 outtakeSlidesRight.setPower(0);
             }
+            rightEncoder = position;
             return Math.abs(target - position) > 25;
         }
     }
@@ -212,6 +213,7 @@ public class OuttakeSlides {
             }
 
             double pos = -outtakeSlidesRight.getCurrentPosition();
+            rightEncoder = pos;
             packet.put("liftPos", pos);
             packet.put("power", outtakeSlidesLeft.getPower());
             if (pos < 700) {
@@ -243,6 +245,7 @@ public class OuttakeSlides {
             }
 
             double pos = -outtakeSlidesRight.getCurrentPosition();
+            rightEncoder = pos;
             packet.put("liftPos", pos);
             if (pos > 630) {
                 return true;
@@ -272,6 +275,7 @@ public class OuttakeSlides {
             }
 
             double pos = -outtakeSlidesRight.getCurrentPosition();
+            rightEncoder = pos;
             packet.put("liftPos", pos);
             if (pos > 10) {
                 return true;
@@ -303,6 +307,7 @@ public class OuttakeSlides {
             }
 
             double pos = -outtakeSlidesRight.getCurrentPosition();
+            rightEncoder = pos;
             packet.put("liftPos", pos);
             if (pos > 10) {
                 return true;

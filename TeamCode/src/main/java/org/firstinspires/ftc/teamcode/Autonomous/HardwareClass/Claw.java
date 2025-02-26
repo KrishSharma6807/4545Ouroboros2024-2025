@@ -37,6 +37,18 @@ public class Claw {
         return new OpenClaw();
     }
 
+    public class OpenClawSample implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            claw.setPosition(openClaw-.2);
+            return false;
+        }
+    }
+    public Action openClawSample() {
+        return new OpenClawSample();
+    }
+
     public class OpenClawWait implements Action {
 
         @Override
@@ -84,15 +96,28 @@ public class Claw {
     }
 
     public class CloseClawWait implements Action {
+        private boolean isFinished = false;
+        private Thread closeClawThread;
 
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            timer.reset();
-            while(timer.seconds() < .5){
+            if (closeClawThread == null) { // Start the thread only once
+                closeClawThread = new Thread(() -> {
+                    ElapsedTime timer = new ElapsedTime();
+                    timer.reset();
 
+                    while (timer.seconds() < 0.5) {
+                        // Do nothing, just wait
+                    }
+
+                    claw.setPosition(closeClaw);
+                    isFinished = true;
+                });
+                closeClawThread.start();
             }
-            claw.setPosition(closeClaw);
-            return false;
+
+            // If thread has finished, return false to signal completion
+            return !isFinished;
         }
     }
 

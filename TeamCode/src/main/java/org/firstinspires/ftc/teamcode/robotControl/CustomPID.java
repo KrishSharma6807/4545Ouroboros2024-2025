@@ -30,15 +30,24 @@ public class CustomPID {
         this.kF = kF;
     }
 
+    public void setPID(double kP, double kI, double kD, double kF) {
+        this.kP = kP;
+        this.kI = kI;
+        this.kD = kD;
+        this.kF = kF;
+    }
+
+
     public double calculatePower(double desiredPos, double currentPos){
         double internalTimer = getTimeRan();
 
         lowPass = a * currentPos + (1 - a) * lowPass;
         double error = desiredPos - currentPos;
-        integralSum =  error * timer.currentTime();
+        integralSum +=  error * timer.currentTime();
         derivative = (error - previousError) / internalTimer;
 
         double power = kP * error + kI * integralSum + kD * derivative + kF;
+        previousError = error;
         return power;
     }
 

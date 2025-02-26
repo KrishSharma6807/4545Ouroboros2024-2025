@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.threadTeleOp;
 
+import static org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.OuttakeSlides.rightEncoder;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -12,6 +14,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
+import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.OuttakeSlides;
 import org.firstinspires.ftc.teamcode.ThreadHandler;
 import org.firstinspires.ftc.teamcode.robotControl.CustomPID;
 
@@ -443,8 +446,8 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
     }
     public void ArcadeDriveBar() {
 
-        double left_stick_x = gamepad1.left_stick_x;
-        double left_stick_y = gamepad1.left_stick_y;
+        double left_stick_x = gamepad1.left_stick_x * -1;
+        double left_stick_y = gamepad1.left_stick_y * -1;
         double right_stick_x = gamepad1.right_stick_x;
 
         voltage = hardwareMap.voltageSensor.iterator().next().getVoltage();
@@ -453,10 +456,10 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
 
         if (Math.abs(left_stick_x) > 0.1 ||
                 Math.abs(left_stick_y) >.1|| Math.abs(right_stick_x) > 0.1){
-            fr.setPower(/*voltage/13.5 **/ ((left_stick_y + left_stick_x) + right_stick_x) * -1);
-            fl.setPower(((left_stick_y - left_stick_x) - right_stick_x) * -1);
-            br.setPower(((left_stick_y - left_stick_x) + right_stick_x) * -1);
-            bl.setPower(((left_stick_y + left_stick_x) - right_stick_x) * -1);
+            fr.setPower(/*voltage/13.5 **/ ((left_stick_y + left_stick_x) + right_stick_x) );
+            fl.setPower(((left_stick_y - left_stick_x) - right_stick_x));
+            br.setPower(((left_stick_y - left_stick_x) + right_stick_x) );
+            bl.setPower(((left_stick_y + left_stick_x) - right_stick_x) );
         }
         else{
             fl.setPower(0);
@@ -582,6 +585,10 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
                 }
 
             });
+            if(gamepad2.start){
+                outtakeSlidesRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                outtakeSlidesRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            }
             th_outtake.queue(outtake_down);
             targetPositionSet = false;
         }
@@ -725,10 +732,10 @@ public abstract class ThreadTeleLibBLUE extends OpMode {
 
     public void intake() {
         if(gamepad2.y) {
-            intake.setPower(-1);
+            intake.setPower(1);
             intakeActive = false;
         } else if (gamepad2.b) {
-            intake.setPower(1);
+            intake.setPower(-1);
             intakeActive = true;
         } else {
             intake.setPower(0);

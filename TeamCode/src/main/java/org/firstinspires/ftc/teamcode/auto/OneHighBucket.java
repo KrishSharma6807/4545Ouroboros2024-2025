@@ -18,7 +18,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.Arm;
 import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.Claw;
 import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.HorizontalSlides;
-import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.IntakeAuto;
+import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.Intake;
 import org.firstinspires.ftc.teamcode.Autonomous.HardwareClass.OuttakeSlides;
 import org.firstinspires.ftc.teamcode.PinpointDrive;
 
@@ -44,7 +44,7 @@ public class OneHighBucket extends LinearOpMode {
         OuttakeSlides slides = new OuttakeSlides(hardwareMap);
         Claw claw = new Claw(hardwareMap);
         Arm arm = new Arm(hardwareMap);
-        IntakeAuto intake = new IntakeAuto(hardwareMap);
+        Intake intake = new Intake(hardwareMap);
         HorizontalSlides hSlides = new HorizontalSlides(hardwareMap);
         VelConstraint baseVelConstraint = new MinVelConstraint(Arrays.asList(
                 new TranslationalVelConstraint(baseTransVel),

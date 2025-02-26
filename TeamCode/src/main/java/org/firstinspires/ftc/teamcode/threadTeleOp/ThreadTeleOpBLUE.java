@@ -60,7 +60,7 @@ public class ThreadTeleOpBLUE extends ThreadTeleLibBLUE {
         // Update bumper state
         wasBumperPressed = isBumperPressed;
 
-        boolean isAPressed = gamepad1.a;
+        boolean isAPressed = gamepad1.y;
 
         if (isAPressed && !wasAPressed) { // Transition from unpressed to pressed
             if (drivemode == driveMode.INTAKE) {
