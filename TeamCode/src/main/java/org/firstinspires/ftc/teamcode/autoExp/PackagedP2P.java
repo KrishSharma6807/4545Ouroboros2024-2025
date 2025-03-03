@@ -54,6 +54,20 @@ public class PackagedP2P {
         this.targetH = h;
     }
 
+    // Expose the getPoseEstimate method to allow access from other classes
+    public Pose2d getPoseEstimate() {
+        pinpointDrive.updatePoseEstimate();
+        return pinpointDrive.getPoseEstimate();
+    }
+
+    // Make stopMotors public so it can be called from outside the class
+    public void stopMotors() {
+        fl.setPower(0);
+        bl.setPower(0);
+        br.setPower(0);
+        fr.setPower(0);
+    }
+
     public void runToPosition(LinearOpMode opMode) {
         while (opMode.opModeIsActive() && !isAtTarget()) {
             pinpointDrive.updatePoseEstimate();
@@ -72,6 +86,37 @@ public class PackagedP2P {
         }
         stopMotors();
     }
+///////////////////////////////////////////
+    public void runToPositionIterative() {
+        pinpointDrive.updatePoseEstimate();
+        xController.setPID(pX, iX, dX, xF);
+        yController.setPID(pY, iY, dY, yF);
+        hController.setPID(pH, iH, dH, hF);
+        Pose2d robotPose = pinpointDrive.getPoseEstimate();
+        Pose powers = getPower(robotPose);
+
+        fl.setPower(powers.getX() + lateralMultiplier * powers.getY() + d * powers.heading);
+        bl.setPower(powers.getX() - lateralMultiplier * powers.getY() + d * powers.heading);
+        br.setPower(powers.getX() + lateralMultiplier * powers.getY() - d * powers.heading);
+        fr.setPower(powers.getX() - lateralMultiplier * powers.getY() - d * powers.heading);
+
+        sendTelemetry(robotPose);
+    }
+
+    // Add this method to directly set motor powers for simple operations
+    public void setMotorPowers(double leftPower, double rightPower) {
+        fl.setPower(leftPower);
+        bl.setPower(leftPower);
+        br.setPower(rightPower);
+        fr.setPower(rightPower);
+    }
+
+    // Add this method to update pose estimate (needed for tracking)
+    public void update() {
+        pinpointDrive.updatePoseEstimate();
+    }
+////////////////////////////////////////////////////////
+
 
     private void sendTelemetry(Pose2d robotPose) {
         TelemetryPacket packet = new TelemetryPacket();
@@ -114,13 +159,6 @@ public class PackagedP2P {
                 Math.abs(errorH) <= 0.2;
     }
 
-    private void stopMotors() {
-        fl.setPower(0);
-        bl.setPower(0);
-        br.setPower(0);
-        fr.setPower(0);
-    }
-
     private Pose getPower(Pose2d robotPose) {
         double currentX = robotPose.position.x;
         double currentY = robotPose.position.y;
@@ -135,7 +173,7 @@ public class PackagedP2P {
         double virtualTargetH = currentHeading + error;
 
         double positionError = Math.hypot(targetX - currentX, targetY - currentY);
-       // double headingWeight = Range.clip(positionError / 5.0, 0.2, 1.0); // Scale heading influence dynamically
+        // double headingWeight = Range.clip(positionError / 5.0, 0.2, 1.0); // Scale heading influence dynamically
 
         double hPower = hController.calculatePower(0, error) + Math.signum(hController.calculatePower(0, error)) * hF;
         //double hPower = -hController.calculatePower(error, 0) + Math.signum(-hController.calculatePower(error, 0)) * hF;

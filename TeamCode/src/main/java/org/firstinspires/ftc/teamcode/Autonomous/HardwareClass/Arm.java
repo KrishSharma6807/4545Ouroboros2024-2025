@@ -15,12 +15,13 @@ public class Arm {
     public Servo armRight;
     public Servo wrist;
     public Servo claw;
-    public static double armRight1Specimen = .15;
+    public static double armRight1Specimen = .11;
     public static double armRight2Specimen = 1;//.2 is max, 1 is min (tune min more)
+    public static double armRight3Specimen = .55;
 
-
-    public static double armLeft1Specimen = .83;
+    public static double armLeft1Specimen = .88;
     public static double armLeft2Specimen = .3;
+    public static double armLeft3Specimen = .8;
 
     public static double wrist1Specimen = .85;
     public static double wrist2Specimen = .085;

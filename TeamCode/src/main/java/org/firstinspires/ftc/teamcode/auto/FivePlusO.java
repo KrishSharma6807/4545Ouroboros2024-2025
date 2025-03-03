@@ -31,7 +31,7 @@ import java.util.Arrays;
 @Autonomous(name = "FivePlusO", group = "Autonomous")
 public class FivePlusO extends LinearOpMode {
     public static double xPosBar = 17;
-    public static double yPosBar = -33;
+    public static double yPosBar = -35;
     public static double SplineHeading = 90;
     public static double baseAccelMin = -20;
     public static double baseAccelMax = 50;
@@ -55,7 +55,7 @@ public class FivePlusO extends LinearOpMode {
     @Override
     public void runOpMode() {
         // instantiate your MecanumDrive at a particular pose.
-        Pose2d initialPose = new Pose2d(33, -63, Math.toRadians(-90));
+        Pose2d initialPose = new Pose2d(10, -63, Math.toRadians(-90));
         PinpointDrive drive = new PinpointDrive(hardwareMap, initialPose);
         OuttakeSlides slides = new OuttakeSlides(hardwareMap);
         Claw claw = new Claw(hardwareMap);
@@ -72,7 +72,7 @@ public class FivePlusO extends LinearOpMode {
         TrajectoryActionBuilder toBar1 = drive.actionBuilder(initialPose)
                 .waitSeconds(0.1)
                 .setTangent(90)
-                .splineToLinearHeading(new Pose2d(xPosBar,yPosBar+1, Math.toRadians(-90)), Math.toRadians(SplineHeading));
+                .splineToLinearHeading(new Pose2d(xPosBar,yPosBar+5, Math.toRadians(-90)), Math.toRadians(SplineHeading));
 
         TrajectoryActionBuilder pushSpikes = toBar1.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-90))
