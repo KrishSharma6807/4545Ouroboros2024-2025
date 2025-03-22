@@ -23,7 +23,7 @@ public class Arm {
     public static double armLeft2Specimen = .3;
     public static double armLeft3Specimen = .8;
 
-    public static double wrist1Specimen = .85;
+    public static double wrist1Specimen = .925;
     public static double wrist2Specimen = .085;
 
     public static double armLeft1Sample = .95;

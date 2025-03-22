@@ -32,9 +32,17 @@ public class FourHighBucket extends LinearOpMode {
     public static double baseAccelMax = 20;
     public static double baseTransVel = 45;
     public static double baseAngularVel = Math.PI;
-    public static double bucketX = -56;
-    public static double bucketY = -56;
+    public static double bucketX = -54;
+    public static double bucketY = -54;
     public static double bucketHeading = 45;
+    public static double spikeX1 = 44;
+    public static double spikeX2 = 54;
+    public static double spikeX3 = 64;
+    public static double spikeY = 38;
+    public static double xBucket = 53;
+    public static double yBucket = 53;
+    public static double xPosBar = 22;
+    public static double yPosBar = 0;
 
     @Override
     public void runOpMode() {
@@ -54,31 +62,31 @@ public class FourHighBucket extends LinearOpMode {
 
         TrajectoryActionBuilder toBucket = drive.actionBuilder(initialPose)
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(56,56, Math.toRadians(-135)), Math.toRadians(0));
+                .splineToLinearHeading(new Pose2d(xBucket,yBucket, Math.toRadians(-135)), Math.toRadians(0));
         TrajectoryActionBuilder firstSample = toBucket.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-135))
-                .splineToLinearHeading(new Pose2d(47, 38, Math.toRadians(-90)), Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(47, 20, Math.toRadians(-90)), Math.toRadians(-90));
+                .splineToLinearHeading(new Pose2d(spikeX1, spikeY, Math.toRadians(-90)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(spikeX1, (spikeY - 18), Math.toRadians(-90)), Math.toRadians(-90));
         TrajectoryActionBuilder toBucket2 = firstSample.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(56,56, Math.toRadians(-135)), Math.toRadians(100));
+                .splineToLinearHeading(new Pose2d(xBucket,yBucket, Math.toRadians(-135)), Math.toRadians(100));
         TrajectoryActionBuilder secondSample = toBucket2.endTrajectory().fresh()
                 .setTangent(Math.toRadians(290))
-                .splineToLinearHeading(new Pose2d(56, 38, Math.toRadians(-90)), Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(56, 20, Math.toRadians(-90)), Math.toRadians(-90));
+                .splineToLinearHeading(new Pose2d(spikeX2, spikeY, Math.toRadians(-90)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(spikeX2, (spikeY - 18), Math.toRadians(-90)), Math.toRadians(-90));
         TrajectoryActionBuilder toBucket3 = secondSample.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(56,56, Math.toRadians(-135)), Math.toRadians(100));
+                .splineToLinearHeading(new Pose2d(xBucket,yBucket, Math.toRadians(-135)), Math.toRadians(100));
         TrajectoryActionBuilder thirdSample = toBucket3.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(57, 25, Math.toRadians(0)), Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(64, 25, Math.toRadians(0)), Math.toRadians(-90));
+                .splineToLinearHeading(new Pose2d((spikeX3 - 7), (spikeY), Math.toRadians(0)), Math.toRadians(-90))
+                .splineToLinearHeading(new Pose2d(spikeX3, (spikeY), Math.toRadians(0)), Math.toRadians(-90));
         TrajectoryActionBuilder toBucket4 = thirdSample.endTrajectory().fresh()
                 .setTangent(Math.toRadians(90))
-                .splineToLinearHeading(new Pose2d(56,56, Math.toRadians(-135)), Math.toRadians(100));
+                .splineToLinearHeading(new Pose2d(xBucket,yBucket, Math.toRadians(-135)), Math.toRadians(100));
         TrajectoryActionBuilder park = toBucket4.endTrajectory().fresh()
                 .setTangent(Math.toRadians(-90))
-                .splineToLinearHeading(new Pose2d(22,0, Math.toRadians(0)), Math.toRadians(180));
+                .splineToLinearHeading(new Pose2d(xPosBar,yPosBar, Math.toRadians(0)), Math.toRadians(180));
         TrajectoryActionBuilder waitShort = park.endTrajectory().fresh()
                 .waitSeconds(5);
         TrajectoryActionBuilder wait = park.endTrajectory().fresh()
@@ -98,11 +106,11 @@ public class FourHighBucket extends LinearOpMode {
         TrajectoryActionBuilder waitClaw4 = park.endTrajectory().fresh()
                 .waitSeconds(.75);
         TrajectoryActionBuilder waitLong = park.endTrajectory().fresh()
-                .waitSeconds(.35);
+                .waitSeconds(.5);
         TrajectoryActionBuilder waitLong2 = park.endTrajectory().fresh()
-                .waitSeconds(.35);
+                .waitSeconds(.5);
         TrajectoryActionBuilder waitLong3 = park.endTrajectory().fresh()
-                .waitSeconds(.35);
+                .waitSeconds(.5);
         
         waitForStart();
         if (isStopRequested()) return;

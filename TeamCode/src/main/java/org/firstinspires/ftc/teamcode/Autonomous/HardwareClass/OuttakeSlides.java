@@ -102,7 +102,7 @@ public class OuttakeSlides {
                 outtakeSlidesRight.setPower(0);
             }
             rightEncoder = position;
-            return Math.abs(target - position) > 25;
+            return Math.abs(target - position) > 50;
         }
     }
     public Action PIDGrab() {
